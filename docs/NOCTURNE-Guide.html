@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOCTURNE Guide</title>
+<style>
+@font-face { font-family: "Archivo"; font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; src: url(/static/fonts/archivo-latin-wdth-normal.woff2) format("woff2"); }
+@font-face { font-family: "Spline Sans Mono"; font-weight: 300 700; font-display: swap; src: url(/static/fonts/spline-sans-mono-latin-wght-normal.woff2) format("woff2"); }
+:root {
+  --brand: #00446A; --brand-tint: #E4EEF5; --brand-tint-2: #CFE0EC; --steel: #77787B; --paper: #fff; --canvas: #F3F6F8;
+  --ink: #0E2232; --ink-2: #44525F; --line: #DCE3E9; --p1: #C8102E; --p2: #E07A1F; --p3: #C29100; --p4: #2F8F83; --good: #2E8540; --violet: #7B4FA6;
+  --font: "Archivo", "Segoe UI", system-ui, sans-serif; --mono: "Spline Sans Mono", Consolas, ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --brand: #5FA8DC; --brand-tint: #0F3350; --brand-tint-2: #154466; --steel: #A9AAAD; --paper: #0C2435; --canvas: #061724; --ink: #E8F0F6; --ink-2: #A9BAC8; --line: #1D3A52; --violet: #B394E0; }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font: 400 15.5px/1.62 var(--font); color: var(--ink); background: var(--canvas); }
+a { color: var(--brand); }
+code, .mono { font-family: var(--mono); font-size: .86em; }
+code { background: var(--brand-tint); padding: 1px 6px; border-radius: 5px; }
+pre { font-family: var(--mono); font-size: 12.5px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; line-height: 1.55; }
+.layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: 100vh; }
+aside { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; background: #00446A; color: #fff; padding: 26px 18px 40px; }
+aside img { width: 140px; display: block; }
+aside .prod { font-weight: 800; font-stretch: 125%; font-size: 22px; margin: 10px 0 2px; letter-spacing: .02em; }
+aside .sub { font-size: 12.5px; opacity: .75; margin-bottom: 18px; }
+aside nav a { display: block; color: rgba(255,255,255,.85); text-decoration: none; padding: 5px 10px; border-radius: 7px; font-size: 14px; }
+aside nav a:hover { background: rgba(255,255,255,.1); color: #fff; }
+aside nav a.l2 { padding-left: 22px; font-size: 13px; opacity: .8; }
+main { padding: 40px clamp(18px, 4vw, 56px) 80px; max-width: 1180px; }
+header.hero { background: linear-gradient(135deg, #00446A, #00243B); color: #fff; border-radius: 20px; padding: 34px 36px; margin-bottom: 30px; position: relative; overflow: hidden; }
+header.hero h1 { font-size: clamp(34px, 5vw, 58px); font-weight: 900; font-stretch: 122%; margin: 0; letter-spacing: -.02em; line-height: 1; }
+header.hero p { max-width: 720px; color: rgba(255,255,255,.85); font-size: 17px; margin: 14px 0 0; }
+h2 { font-size: 28px; font-weight: 800; font-stretch: 115%; letter-spacing: -.01em; margin: 56px 0 12px; padding-top: 10px; border-top: 3px solid var(--brand); scroll-margin-top: 20px; }
+h3 { font-size: 19px; font-weight: 750; font-stretch: 106%; margin: 30px 0 8px; scroll-margin-top: 20px; }
+h4 { font-size: 15.5px; margin: 20px 0 6px; }
+p, li { max-width: 78ch; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 12px 0 18px; }
+th { text-align: left; background: var(--brand-tint); color: var(--ink); font-weight: 700; padding: 9px 12px; font-size: 13px; }
+td { padding: 8px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+.wrap { overflow-x: auto; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin: 14px 0; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.note { border-left: 4px solid var(--brand); background: var(--brand-tint); padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 14px 0; }
+.warn { border-left-color: var(--p2); background: color-mix(in srgb, var(--p2) 12%, var(--paper)); }
+.diagram { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin: 16px 0 22px; overflow-x: auto; }
+.diagram svg { display: block; min-width: 980px; width: 100%; height: auto; }
+.diagram figcaption { font-size: 13px; color: var(--ink-2); margin-top: 8px; }
+svg text { font-family: var(--font); fill: var(--ink); }
+svg .t { font-size: 13px; font-weight: 700; } svg .s { font-size: 11px; fill: var(--ink-2); } svg .h { font-size: 15px; font-weight: 800; }
+svg .box { fill: var(--paper); stroke: var(--line); stroke-width: 1.5; } svg .brand { fill: var(--brand-tint); stroke: var(--brand); stroke-width: 1.5; }
+svg .navy { fill: #00446A; } svg .navy-t { fill: #fff; font-weight: 800; } svg .zone { fill: none; stroke: var(--steel); stroke-dasharray: 5 5; stroke-width: 1.2; }
+svg .arrow { stroke: var(--brand); stroke-width: 1.8; fill: none; marker-end: url(#ah); } svg .arrow.g { stroke: var(--steel); marker-end: url(#ahg); stroke-dasharray: 4 4; }
+svg .ai { fill: color-mix(in srgb, var(--violet) 14%, var(--paper)); stroke: var(--violet); stroke-width: 1.5; } svg .db { fill: var(--brand-tint); stroke: var(--brand); stroke-width: 1.5; }
+.pill { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.P1 { background: #FCE8EB; color: #A10C25; } .P2 { background: #FDF0E3; color: #A4520B; } .P3 { background: #FBF4DC; color: #7C5D00; } .P4 { background: #E2F3F0; color: #1D6A60; }
+.y { color: var(--good); font-weight: 800; } .n { color: var(--steel); }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } aside { position: static; height: auto; } }
+@media print { aside { display: none; } .layout { display: block; } h2 { page-break-before: always; } }
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <img src="/static/img/ferguson-logo-white.png" alt="Ferguson">
+  <div class="prod">NOCTURNE</div>
+  <div class="sub">Network alert triage for the NOC. Guide and reference.</div>
+  <nav>
+    <a href="#overview">1. Overview</a>
+    <a href="#quickstart">2. Quick start</a>
+    <a href="#architecture">3. Architecture</a>
+    <a href="#flows">4. Data flows</a>
+    <a href="#roles">5. Roles and access</a>
+    <a href="#screens">6. Using each screen</a>
+    <a href="#etl">7. Import engine (ETL)</a>
+    <a class="l2" href="#etl-formats">Formats and detection</a>
+    <a class="l2" href="#etl-events-map">Event column mapping</a>
+    <a class="l2" href="#etl-tickets-map">Ticket column mapping</a>
+    <a class="l2" href="#etl-dates">Timestamps</a>
+    <a class="l2" href="#etl-reupload">Re-uploads and duplicates</a>
+    <a class="l2" href="#etl-sites">Sites and devices</a>
+    <a class="l2" href="#etl-quality">Quality report</a>
+    <a href="#classify">8. Classification</a>
+    <a href="#linking">9. Ticket linking</a>
+    <a class="l2" href="#link-time">Time evidence</a>
+    <a class="l2" href="#resync">Resync</a>
+    <a href="#correlation">10. Correlation and health</a>
+    <a href="#recommend">11. Recommendations</a>
+    <a href="#ai">12. Gemini and caching</a>
+    <a href="#diag">13. Preliminary checks</a>
+    <a href="#sim">14. Simulation</a>
+    <a href="#live">15. Live stream</a>
+    <a href="#schema">16. Database</a>
+    <a href="#api">17. API reference</a>
+    <a href="#config">18. Configuration</a>
+    <a href="#security">19. Security</a>
+    <a href="#ops">20. Operations and scaling</a>
+    <a href="#dataquality">21. Findings on the supplied exports</a>
+    <a href="#code">22. Code map</a>
+  </nav>
+</aside>
+<main>
+<header class="hero">
+  <h1>NOCTURNE</h1>
+  <p>A Python web console that turns raw monitoring events and ServiceNow history into triaged alerts. Each alert comes with its device and site context, correlated neighbours, ranked past incidents, preliminary checks and a first-response plan. The plan is written by the built-in engine and can be extended by Gemini.</p>
+</header>
+
+<h2 id="overview">1. Overview</h2>
+<p>NOCTURNE serves Network Operations Center analysts and the administrators who feed it data. It is a single Python service (FastAPI) that renders its own HTML screens, stores everything in one SQLite file and runs imports in a background worker. Everything is configured in one file, <code>nocturne.toml</code>.</p>
+<div class="grid2">
+  <div class="card"><h4>What an analyst gets</h4><ul>
+    <li>A live, colour-coded alert console with full-text search, facets and bulk actions.</li>
+    <li>A five-stage triage for any alert: alert analysis, log investigation, ticket history, preliminary checks, recommendation.</li>
+    <li>Device, site and ticket profiles; health scores; outage and flapping analysis.</li>
+    <li>A ready-to-paste ServiceNow work note.</li></ul></div>
+  <div class="card"><h4>What an administrator gets</h4><ul>
+    <li>Data Studio: upload, auto-mapping review, background import, quality reports, event catalogue.</li>
+    <li>Simulator: realistic scenarios, random alerts and custom triggers.</li>
+    <li>User management, role matrix, audit trail and effective settings.</li></ul></div>
+</div>
+<div class="note">The recommendation engine works without any external service. Gemini is an optional layer on top. Its answers are cached and always labelled, and if it cannot be used the console falls back to the engine and says so.</div>
+
+<h2 id="quickstart">2. Quick start</h2>
+<pre>python -m venv .venv &amp;&amp; source .venv/bin/activate      # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python run.py                                             # http://localhost:8080</pre>
+<ol>
+  <li>Sign in as <code>admin</code>. Without <code>NOCTURNE_ADMIN_PASSWORD</code> set, the first password is <code>ChangeMe@2026</code> and must be changed at once.</li>
+  <li>Open <b>Data Studio</b> and drop the event export and the ticket export together. Review the proposed mapping and start each import. The full 134K-event export takes about 17 seconds.</li>
+  <li>Open <b>Overview</b>, then <b>Alerts</b>, and select any card to run the triage.</li>
+  <li>Optional: set <code>GEMINI_API_KEY</code> before starting to switch on AI analysis.</li>
+</ol>
+<table><tr><th>Environment variable</th><th>Purpose</th><th>If unset</th></tr>
+<tr><td><code>NOCTURNE_SECRET_KEY</code></td><td>Signs session cookies</td><td>A random key is generated once into <code>data/.secret</code></td></tr>
+<tr><td><code>NOCTURNE_ADMIN_PASSWORD</code></td><td>Password of the first administrator</td><td><code>ChangeMe@2026</code>, with a forced change at first sign-in</td></tr>
+<tr><td><code>GEMINI_API_KEY</code></td><td>Enables Gemini analysis</td><td>Built-in engine only. Recommendations are labelled "Fallback" where AI was expected.</td></tr>
+<tr><td><code>NOCTURNE__SECTION__KEY</code></td><td>Overrides any value in <code>nocturne.toml</code>, e.g. <code>NOCTURNE__DIAGNOSTICS__MODE=live</code></td><td>The file value is used</td></tr>
+<tr><td><code>NOCTURNE_CONFIG</code></td><td>Path to an alternative config file</td><td><code>nocturne.toml</code> beside <code>run.py</code></td></tr></table>
+<p>Tests: <code>pip install pytest &amp;&amp; python -m pytest -q tests</code> (52 tests: classification, timestamps, ETL, re-uploads and ticket versions, linking, API, RBAC, CSRF, sessions and sign-in throttling, input validation, simulator concurrency, caching and compression, AI caching and fallback).</p>
+
+<h2 id="architecture">3. Architecture</h2>
+<figure class="diagram">
+<svg viewBox="0 0 1120 760" role="img" aria-label="Architecture diagram">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#00446A"/></marker>
+    <marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#77787B"/></marker>
+  </defs>
+  <!-- users -->
+  <rect x="20" y="20" width="250" height="70" rx="12" class="box"/><text x="36" y="48" class="t">NOC Analyst (role: user)</text><text x="36" y="68" class="s">Dashboards, alerts, triage, checks, feedback</text>
+  <rect x="290" y="20" width="250" height="70" rx="12" class="box"/><text x="306" y="48" class="t">Administrator (role: admin)</text><text x="306" y="68" class="s">Plus Data Studio, simulator, users, audit</text>
+  <!-- browser -->
+  <rect x="20" y="115" width="1080" height="105" rx="14" class="brand"/>
+  <text x="36" y="140" class="h">Browser</text>
+  <rect x="36" y="152" width="250" height="56" rx="10" class="box"/><text x="50" y="175" class="t">Page shells (Jinja2)</text><text x="50" y="194" class="s">base.html + one template per screen</text>
+  <rect x="300" y="152" width="250" height="56" rx="10" class="box"/><text x="314" y="175" class="t">core.js + charts.js</text><text x="314" y="194" class="s">API client, cards, palette, SVG charts</text>
+  <rect x="564" y="152" width="250" height="56" rx="10" class="box"/><text x="578" y="175" class="t">pages/*.js</text><text x="578" y="194" class="s">Dashboard, alerts, triage, studio…</text>
+  <rect x="828" y="152" width="256" height="56" rx="10" class="box"/><text x="842" y="175" class="t">EventSource (SSE)</text><text x="842" y="194" class="s">alert, alert_state, job, data, sim</text>
+  <path class="arrow" d="M145 90 V113"/><path class="arrow" d="M415 90 V113"/>
+  <!-- app -->
+  <rect x="20" y="245" width="1080" height="300" rx="14" class="zone"/>
+  <text x="36" y="270" class="h">FastAPI application · run.py → app/web.py</text>
+  <rect x="36" y="282" width="1048" height="44" rx="10" class="box"/>
+  <text x="50" y="309" class="t">Middleware and access</text><text x="230" y="309" class="s">Signed session cookie · CSRF header on writes · role → capability check (security.py) · security headers · audit log</text>
+  <path class="arrow" d="M560 220 V280"/>
+  <g>
+    <rect x="36" y="338" width="160" height="62" rx="10" class="brand"/><text x="48" y="362" class="t">auth</text><text x="48" y="382" class="s">/api/auth/*</text>
+    <rect x="206" y="338" width="160" height="62" rx="10" class="brand"/><text x="218" y="362" class="t">alerts</text><text x="218" y="382" class="s">console + 5-stage triage</text>
+    <rect x="376" y="338" width="160" height="62" rx="10" class="brand"/><text x="388" y="362" class="t">inventory</text><text x="388" y="382" class="s">insights, devices, sites, tickets</text>
+    <rect x="546" y="338" width="160" height="62" rx="10" class="brand"/><text x="558" y="362" class="t">ops</text><text x="558" y="382" class="s">stream, checks, simulator</text>
+    <rect x="716" y="338" width="160" height="62" rx="10" class="brand"/><text x="728" y="362" class="t">data</text><text x="728" y="382" class="s">uploads, jobs, catalogue</text>
+    <rect x="886" y="338" width="198" height="62" rx="10" class="brand"/><text x="898" y="362" class="t">admin</text><text x="898" y="382" class="s">users, audit, settings</text>
+  </g>
+  <rect x="36" y="414" width="330" height="118" rx="10" class="box"/><text x="50" y="436" class="t">ETL engine · services/etl</text>
+  <text x="50" y="456" class="s">readers → mapping → timeparse → events / tickets</text><text x="50" y="474" class="s">→ linker → FTS rebuild → version bump</text><text x="50" y="492" class="s">runner: background worker thread + job table</text><text x="50" y="510" class="s">restart-safe (interrupted jobs can be re-run)</text>
+  <rect x="376" y="414" width="330" height="118" rx="10" class="box"/><text x="390" y="436" class="t">Intelligence · services</text>
+  <text x="390" y="456" class="s">classify: severity, category, transition, role</text><text x="390" y="474" class="s">correlate: outages, flapping, blast radius, health</text><text x="390" y="492" class="s">analytics (versioned cache) · diagnostics · simulator</text><text x="390" y="510" class="s">recommend: ticket ranking + response plan</text>
+  <rect x="716" y="414" width="368" height="118" rx="10" class="ai"/><text x="730" y="436" class="t">AI layer · services/ai.py</text>
+  <text x="730" y="456" class="s">evidence fingerprint → ai_insights cache</text><text x="730" y="474" class="s">Gemini call only on a miss or refresh</text><text x="730" y="492" class="s">merge with engine and label the source</text><text x="730" y="510" class="s">labelled fallback to the engine on any failure</text>
+  <!-- storage -->
+  <rect x="20" y="575" width="560" height="160" rx="14" class="db"/>
+  <text x="36" y="600" class="h">SQLite (WAL + FTS5) · data/nocturne.db</text>
+  <text x="36" y="624" class="s">events · devices · sites · event_types · tickets · ticket_links</text>
+  <text x="36" y="642" class="s">events_fts · tickets_fts (full-text search and similarity)</text>
+  <text x="36" y="660" class="s">jobs · job_rejects · feedback · ai_insights · users · audit_log · meta</text>
+  <text x="36" y="690" class="s">Upload store: data/uploads (staged files kept so imports can be re-run)</text>
+  <text x="36" y="712" class="s">Config: nocturne.toml + environment variables for secrets</text>
+  <rect x="600" y="575" width="240" height="70" rx="12" class="box"/><text x="614" y="603" class="t">Network devices</text><text x="614" y="623" class="s">ping, traceroute, DNS, TCP (live mode)</text>
+  <rect x="860" y="575" width="240" height="70" rx="12" class="ai"/><text x="874" y="603" class="t">Gemini API (optional)</text><text x="874" y="623" class="s">generateContent, JSON reply</text>
+  <rect x="600" y="665" width="500" height="70" rx="12" class="box"/><text x="614" y="693" class="t">In-process event bus · app/bus.py</text><text x="614" y="713" class="s">Publishes alert, job, data and sim events to every SSE client</text>
+  <path class="arrow" d="M200 532 V573"/><path class="arrow" d="M480 532 V573"/><path class="arrow" d="M680 532 V573"/><path class="arrow" d="M980 532 V573"/>
+  <path class="arrow g" d="M1100 700 C 1118 560 1118 330 1092 212"/>
+</svg>
+<figcaption>Layers and responsibilities. Solid arrows are calls and data. The dashed arrow is the live stream pushed back to browsers.</figcaption>
+</figure>
+<table><tr><th>Layer</th><th>Responsibility</th><th>Key files</th></tr>
+<tr><td>Browser</td><td>Server-rendered page shells. Vanilla JavaScript fetches JSON and renders cards and charts. No framework or build step, and fonts are served locally so it works offline.</td><td><code>web/templates</code>, <code>web/static</code></td></tr>
+<tr><td>Web / API</td><td>Routing, sessions, CSRF, capability checks, validation, audit</td><td><code>app/web.py</code>, <code>app/security.py</code>, <code>app/api/*</code></td></tr>
+<tr><td>Services</td><td>All business logic: import, classification, correlation, ranking, AI, checks, simulation</td><td><code>app/services/*</code></td></tr>
+<tr><td>Storage</td><td>One SQLite database in WAL mode, so imports never block readers. FTS5 indexes for search.</td><td><code>app/db.py</code>, <code>app/schema.sql</code></td></tr>
+<tr><td>Configuration</td><td>One TOML file plus environment overrides. Secrets come only from the environment.</td><td><code>nocturne.toml</code>, <code>app/config.py</code></td></tr></table>
+
+<h2 id="flows">4. Data flows</h2>
+<h3>4.1 Import: from a file to the knowledge base</h3>
+<figure class="diagram">
+<svg viewBox="0 0 1120 560" role="img" aria-label="Import data flow">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#00446A"/></marker>
+    <marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#77787B"/></marker>
+  </defs>
+  <rect x="20" y="30" width="170" height="90" rx="12" class="box"/><text x="34" y="58" class="t">Source files</text><text x="34" y="78" class="s">Event export (SolarWinds)</text><text x="34" y="96" class="s">ServiceNow tickets</text><text x="34" y="112" class="s">CSV · TSV · TXT · XLSX</text>
+  <rect x="220" y="30" width="190" height="90" rx="12" class="brand"/><text x="234" y="58" class="t">1. Upload and stage</text><text x="234" y="78" class="s">size and type checks</text><text x="234" y="96" class="s">encoding + delimiter sniffing</text><text x="234" y="112" class="s">first 40 rows sampled</text>
+  <rect x="440" y="30" width="200" height="90" rx="12" class="brand"/><text x="454" y="58" class="t">2. Detect and propose</text><text x="454" y="78" class="s">dataset signature score</text><text x="454" y="96" class="s">header aliases, then content</text><text x="454" y="112" class="s">sniffing for unnamed columns</text>
+  <rect x="670" y="30" width="200" height="90" rx="12" class="box"/><text x="684" y="58" class="t">3. Admin review</text><text x="684" y="78" class="s">Mapping Studio: change any</text><text x="684" y="96" class="s">field, choose date anchor,</text><text x="684" y="112" class="s">then start the import</text>
+  <rect x="900" y="30" width="200" height="90" rx="12" class="box"/><text x="914" y="58" class="t">4. Queue</text><text x="914" y="78" class="s">job row = queued</text><text x="914" y="96" class="s">worker thread takes one</text><text x="914" y="112" class="s">job at a time</text>
+  <path class="arrow" d="M190 75 H218"/><path class="arrow" d="M410 75 H438"/><path class="arrow" d="M640 75 H668"/><path class="arrow" d="M870 75 H898"/>
+  <rect x="20" y="160" width="1080" height="210" rx="14" class="zone"/><text x="36" y="184" class="h">5. Worker pipeline (progress streamed live to Data Studio)</text>
+  <rect x="36" y="198" width="160" height="150" rx="10" class="box"/><text x="48" y="220" class="t">Read and clean</text><text x="48" y="240" class="s">null tokens and</text><text x="48" y="256" class="s">anonymisation markers</text><text x="48" y="272" class="s">multi-line repair</text><text x="48" y="288" class="s">IP validation</text><text x="48" y="304" class="s">HTML stripped</text><text x="48" y="320" class="s">rejects recorded</text>
+  <rect x="210" y="198" width="160" height="150" rx="10" class="box"/><text x="222" y="220" class="t">Dates</text><text x="222" y="240" class="s">one DD-MM / MM-DD order</text><text x="222" y="256" class="s">per column, proven</text><text x="222" y="272" class="s">from the values;</text><text x="222" y="288" class="s">bad or missing times</text><text x="222" y="304" class="s">rejected with reason</text>
+  <rect x="384" y="198" width="160" height="150" rx="10" class="box"/><text x="396" y="220" class="t">Inventory</text><text x="396" y="240" class="s">devices by name</text><text x="396" y="256" class="s">sites from names</text><text x="396" y="272" class="s">(site column only if</text><text x="396" y="288" class="s">it agrees ≥ 80%)</text><text x="396" y="304" class="s">roles, labels,</text><text x="396" y="320" class="s">event catalogue</text>
+  <rect x="558" y="198" width="160" height="150" rx="10" class="box"/><text x="570" y="220" class="t">Classify</text><text x="570" y="240" class="s">severity P1–P4</text><text x="570" y="256" class="s">category</text><text x="570" y="272" class="s">down / up transition</text><text x="570" y="288" class="s">pair key</text><text x="570" y="304" class="s">actionable vs noise</text>
+  <rect x="732" y="198" width="160" height="150" rx="10" class="db"/><text x="744" y="220" class="t">Upsert</text><text x="744" y="240" class="s">events by EventID:</text><text x="744" y="256" class="s">unchanged skipped</text><text x="744" y="272" class="s">tickets by number:</text><text x="744" y="288" class="s">newest version wins</text><text x="744" y="304" class="s">alert states kept</text>
+  <rect x="906" y="198" width="178" height="150" rx="10" class="brand"/><text x="918" y="220" class="t">Resync</text><text x="918" y="240" class="s">device counters, sites</text><text x="918" y="256" class="s">links CI/device/IP/site</text><text x="918" y="272" class="s">+ alert-time evidence</text><text x="918" y="288" class="s">rebuild FTS indexes</text><text x="918" y="304" class="s">bump data version</text>
+  <path class="arrow" d="M196 273 H208"/><path class="arrow" d="M370 273 H382"/><path class="arrow" d="M544 273 H556"/><path class="arrow" d="M718 273 H730"/><path class="arrow" d="M892 273 H904"/>
+  <path class="arrow" d="M1000 120 V158"/>
+  <rect x="20" y="410" width="340" height="120" rx="12" class="db"/><text x="34" y="438" class="t">Outputs</text><text x="34" y="460" class="s">events, devices, sites, event_types,</text><text x="34" y="478" class="s">tickets, ticket_links, FTS indexes</text><text x="34" y="496" class="s">jobs.stats = quality report</text><text x="34" y="514" class="s">job_rejects = downloadable rejected rows</text>
+  <rect x="390" y="410" width="340" height="120" rx="12" class="box"/><text x="404" y="438" class="t">Notifications</text><text x="404" y="460" class="s">SSE "job" events: stage, progress, message</text><text x="404" y="478" class="s">SSE "data" event when finished</text><text x="404" y="496" class="s">audit_log entry: data.import</text>
+  <rect x="760" y="410" width="340" height="120" rx="12" class="brand"/><text x="774" y="438" class="t">Consumers</text><text x="774" y="460" class="s">Overview and console refresh themselves</text><text x="774" y="478" class="s">Triage uses the new links and history</text><text x="774" y="496" class="s">Catalogue lists newly seen event types</text>
+  <path class="arrow" d="M800 348 Q 600 390 190 408"/><path class="arrow" d="M995 348 V408"/><path class="arrow g" d="M990 348 Q 700 380 560 408"/>
+</svg>
+<figcaption>Every import ends with the same resync the Data Studio button runs, so results never depend on upload order. Re-imports skip unchanged records, update changed ones, never roll a ticket back to an older version and never overwrite alert states set by analysts.</figcaption>
+</figure>
+<h3>4.2 Triage: from an alert to a response plan</h3>
+<figure class="diagram">
+<svg viewBox="0 0 1120 470" role="img" aria-label="Triage data flow">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#00446A"/></marker>
+  </defs>
+  <rect x="20" y="20" width="200" height="80" rx="12" class="box"/><text x="34" y="46" class="t">Alert arrives</text><text x="34" y="66" class="s">import, simulator or custom</text><text x="34" y="84" class="s">→ SSE card in the console</text>
+  <rect x="250" y="20" width="160" height="80" rx="12" class="brand"/><text x="262" y="46" class="t">1 Alert analysis</text><text x="262" y="66" class="s">event, device, site,</text><text x="262" y="84" class="s">extra export columns</text>
+  <rect x="430" y="20" width="160" height="80" rx="12" class="brand"/><text x="442" y="46" class="t">2 Log investigation</text><text x="442" y="66" class="s">outage pair, flaps, blast</text><text x="442" y="84" class="s">radius, timeline, health</text>
+  <rect x="610" y="20" width="160" height="80" rx="12" class="brand"/><text x="622" y="46" class="t">3 Ticket history</text><text x="622" y="66" class="s">links + FTS + timing</text><text x="622" y="84" class="s">+ analyst feedback</text>
+  <rect x="790" y="20" width="150" height="80" rx="12" class="brand"/><text x="802" y="46" class="t">4 Checks</text><text x="802" y="66" class="s">ping, traceroute,</text><text x="802" y="84" class="s">DNS, TCP (60 s cache)</text>
+  <rect x="960" y="20" width="140" height="80" rx="12" class="navy"/><text x="972" y="46" class="t navy-t">5 Recommend</text><text x="972" y="66" class="s" style="fill:#cfe0ec">engine plan</text><text x="972" y="84" class="s" style="fill:#cfe0ec">+ AI layer</text>
+  <path class="arrow" d="M220 60 H248"/><path class="arrow" d="M410 60 H428"/><path class="arrow" d="M590 60 H608"/><path class="arrow" d="M770 60 H788"/><path class="arrow" d="M940 60 H958"/>
+  <rect x="20" y="140" width="520" height="300" rx="14" class="zone"/><text x="36" y="164" class="h">Built-in engine (always runs)</text>
+  <text x="36" y="190" class="s">• Signals: site-wide drop, flapping, recovery, ping verdict, recurrence, close match, open INC</text>
+  <text x="36" y="210" class="s">• Hypothesis by priority: site-level → flapping → hard down → transient → recovery → category template</text>
+  <text x="36" y="230" class="s">  + "last time" resolution from the best ticket (score ≥ 45)</text>
+  <text x="36" y="250" class="s">• Steps: avoid-duplicate → correlation → playbook (config) → proven fixes (tickets ≥ 35)</text>
+  <text x="36" y="270" class="s">• Confidence = 30 + 7 × signal weight + best ticket score / 4 (capped at 95)</text>
+  <text x="36" y="290" class="s">• Route-to group and typical fix time from strong matches; ready-made work note</text>
+  <rect x="36" y="312" width="488" height="110" rx="10" class="box"/><text x="50" y="336" class="t">Ticket score (0–100)</text>
+  <text x="50" y="358" class="s">0.50 × link (CI .98, device .95, IP .85, site .60, same-site device .50)</text><text x="50" y="376" class="s">+ 0.30 × shared specific words + 0.20 × opened near the alert</text><text x="50" y="394" class="s">+ 0.06 if closed with notes + 0.15 if analysts marked it helpful</text><text x="50" y="412" class="s">wording-only matches need ≥ 2 shared words</text>
+  <rect x="580" y="140" width="520" height="300" rx="14" class="zone"/><text x="596" y="164" class="h">AI layer (Gemini, optional)</text>
+  <rect x="596" y="178" width="230" height="64" rx="10" class="ai"/><text x="608" y="202" class="t">Evidence fingerprint</text><text x="608" y="222" class="s">alert + signals + tickets + checks</text>
+  <rect x="852" y="178" width="232" height="64" rx="10" class="db"/><text x="864" y="202" class="t">ai_insights lookup</text><text x="864" y="222" class="s">hit &lt; 24 h → reuse (no cost)</text>
+  <rect x="596" y="262" width="230" height="64" rx="10" class="ai"/><text x="608" y="286" class="t">Gemini call on a miss</text><text x="608" y="306" class="s">or on Refresh; one call per key</text>
+  <rect x="852" y="262" width="232" height="64" rx="10" class="brand"/><text x="864" y="286" class="t">Merge and label</text><text x="864" y="306" class="s">AI steps + proven fixes kept</text>
+  <rect x="596" y="346" width="488" height="76" rx="10" class="box"/><text x="608" y="370" class="t">Labels shown to the analyst</text><text x="608" y="390" class="s">AI analysis (model) · Based on INC… · Saved answer / Fresh answer</text><text x="608" y="408" class="s">Fallback: built-in engine (with the reason) · Built-in engine</text>
+  <path class="arrow" d="M826 210 H850"/><path class="arrow" d="M968 242 Q 900 252 828 290"/><path class="arrow" d="M826 294 H850"/><path class="arrow" d="M1030 100 V176"/>
+</svg>
+<figcaption>Stages run in sequence with a visible progress rail, and each panel fills as its stage finishes.</figcaption>
+</figure>
+
+<h2 id="roles">5. Roles and access</h2>
+<p>Roles and their capabilities live in <code>[roles]</code> and <code>[permissions]</code>. Add a role by giving it a label and listing it on the capabilities it should have. The navigation, page guards and every API endpoint read the same table.</p>
+<div class="wrap"><table><tr><th>Capability</th><th>What it unlocks</th><th>Administrator</th><th>NOC Analyst</th></tr>
+<tr><td>view_dashboard</td><td>Overview</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>view_alerts</td><td>Alert console, search palette</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>investigate</td><td>Triage stages 1, 2, 3, 5</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>run_diagnostics</td><td>Stage 4 and re-running checks</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>update_alert_state</td><td>Acknowledge, resolve, reopen, bulk actions</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>give_feedback</td><td>"Was this useful?" and "this ticket helped"</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>export_data</td><td>CSV export of the console</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>ai_refine</td><td>Ask AI, Refresh AI answer</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>view_inventory / view_tickets</td><td>Devices, sites, tickets</td><td class="y">✓</td><td class="y">✓</td></tr>
+<tr><td>simulate / trigger_custom_alert</td><td>Simulator</td><td class="y">✓</td><td class="n">—</td></tr>
+<tr><td>ingest_data / manage_catalog / purge_data</td><td>Data Studio</td><td class="y">✓</td><td class="n">—</td></tr>
+<tr><td>manage_users / view_audit / view_settings</td><td>Admin</td><td class="y">✓</td><td class="n">—</td></tr></table></div>
+<p>Simulation and imports write data that every analyst sees, so they are administrator-only. Triage, diagnostics and alert ownership are analyst work, so both roles have them.</p>
+
+<h2 id="screens">6. Using each screen</h2>
+<div class="grid2">
+<div class="card"><h4>Overview</h4><p>A navy hero carries six KPIs with change against the previous equal period: open alerts, critical, devices and sites affected, median time to recover, and actionable share. Below it are alerts by hour of day (a "score" of notes by category, coloured by worst severity), the latest unresolved P1/P2 alerts, volume over time stacked by severity, a US state tile map, the noisiest devices, busiest sites, top event types, categories and ticket knowledge. Every bar, note and tile opens the matching filtered list. Windows count back from the newest event, so historical exports read naturally.</p></div>
+<div class="card"><h4>Alerts</h4><p>Colour-coded cards: a severity band (P1 red to P4 teal), a category icon tile, a down/recovered chip, and the IP, site, linked tickets, repeat count and node status. Simulated alerts carry a striped corner and custom alerts a violet one. Search takes words (prefix match), an IP or IP prefix, or a site/FEI code. Facet chips show live counts. The "Show" chip switches between actionable alerts, everything and noise. Cards and compact list views, bulk acknowledge/resolve, CSV export. New alerts slide in live.</p></div>
+<div class="card"><h4>Triage</h4><p>Five stages with a progress rail. Recommended response sits on top with source labels, confidence, evidence, steps you can tick off (remembered per alert), route-to group, typical fix time, the copyable work note and feedback. Alert analysis includes the health ring and the hour-of-day profile. Ticket history shows match % and the reasons for each match. Checks are clearly marked as simulated when they are. Log investigation covers recovery, flapping, site neighbours and the ±24 h timeline.</p></div>
+<div class="card"><h4>Devices, sites, tickets</h4><p>Device profiles show health, activity by day, outages with median recovery, event types, linked tickets, latest events and same-site peers. Site profiles show KPIs, alerts per day, categories, devices with their last node state, latest alerts and tickets. Ticket pages show "what fixed it", the parsed work-note timeline, how each link was made with its confidence, and the extracted facts.</p></div>
+<div class="card"><h4>Simulator</h4><p>Five scenarios run against real devices: random, site outage cascade, flapping interface, power event and WAN failover. You set the count, the pace and an optional site. The custom trigger takes an existing or new device (new ones get their site from the name), a catalogue type or a custom name, a message with <code>{device}</code>, a severity override and a burst count, and previews the classification as you type. A live feed shows everything arriving.</p></div>
+<div class="card"><h4>Data Studio and Admin</h4><p>Data Studio covers knowledge-base totals, drop-zone upload, Mapping Studio review, import history with live progress, quality reports and rejected-row downloads, the event catalogue editor, event and ticket date ranges with an overlap check, Resync with its report, and purges (typed confirmation). Admin covers people (add, role, disable, reset), the role matrix, the audit trail with filters, and effective settings with secrets masked, including AI cache statistics.</p></div>
+<div class="card"><h4>Loading feedback</h4><p>Every wait is visible. A thin progress bar runs under the top bar while any request is in flight. A button that starts work (Resync, Start import, Ask AI, Report, Save) shows a spinner and cannot be pressed twice. Lists and panels show shimmering placeholders until their first data arrives, and dim with a spinner while a filter or time window refreshes them. Live updates and background polling refresh quietly without any of these.</p></div>
+</div>
+<p>Keyboard: <code>Ctrl/⌘ K</code> or <code>/</code> opens the search palette. <code>g</code> then <code>o</code>, <code>a</code>, <code>d</code>, <code>s</code> or <code>t</code> jumps to a screen, and <code>Esc</code> closes. Day and night themes follow the system and can be switched in the top bar. The layout works down to phone width, where navigation moves to a bottom bar.</p>
+
+<h2 id="etl">7. Import engine (ETL)</h2>
+<h3 id="etl-formats">7.1 Formats and detection</h3>
+<ul>
+<li><b>Formats:</b> CSV, TSV, TXT (delimiter sniffed among <code>, ; tab |</code>) and XLSX/XLSM (the sheet with the most rows). Size limit: <code>storage.max_upload_mb</code>.</li>
+<li><b>Encoding:</b> UTF-8 (with or without BOM), then Windows-1252, then Latin-1. The ServiceNow export is Windows-1252 and is read correctly.</li>
+<li><b>Headers:</b> blank headers become <code>column_N</code>. Rows longer than the header gain extra positional columns. Header matching ignores case, spaces, underscores and punctuation.</li>
+<li><b>Dataset detection:</b> each dataset has weighted signature fields, for example events: EventID 2, time 3, type 2, device 2; tickets: number 3, short description 3, created 2, notes 2. The higher score wins, and below 30% the file is "unknown" and the admin chooses.</li>
+<li><b>Content sniffing (events):</b> if the column called "Message" holds short, repetitive values while an unnamed column holds long free text, the first becomes the <i>event type name</i> and the long column the <i>message</i>. This is how the SolarWinds export is shaped. A column of 3–5 digit codes becomes a <i>site hint</i>. Time and IP columns are found by pattern when no header matches.</li>
+<li><b>Nothing is lost:</b> every unmapped, non-empty value is stored per record in <code>extra</code> (JSON) and shown in triage under "Other columns from the export".</li>
+</ul>
+
+<h3 id="etl-events-map">7.2 Event export: source → database</h3>
+<div class="wrap"><table><tr><th>Field</th><th>Accepted headers (aliases)</th><th>Stored as</th><th>Processing</th></tr>
+<tr><td>source_id</td><td>EventID, id, AlertID, event_number, EventNo</td><td><code>events.source_id</code></td><td>Integer; the upsert key with <code>source='import'</code>. If the column is absent, a stable hash of time, device, IP, type and message is used. A present but empty value rejects the row.</td></tr>
+<tr><td>time</td><td>EventTime, EventDateTime, timestamp, datetime, occurred, triggeredAt, detectedAt, receivedAt, logTime</td><td><code>events.ts</code></td><td>Required: a full date and time per row. Numeric dates (DD-MM or MM-DD, 2- or 4-digit years), ISO, named months, AM/PM ("21:22 PM" read as 21:22) and Excel day numbers. A separate <code>date</code> column is joined when the export splits them. Content sniffing finds an unlabelled timestamp column.</td></tr>
+<tr><td>date</td><td>EventDate, date, day</td><td>joined with time</td><td>For exports that split date and time.</td></tr>
+<tr><td>type_id</td><td>EventType, EventTypeID, TypeID</td><td><code>events.type_id</code>, <code>event_types</code></td><td>Integer, catalogued.</td></tr>
+<tr><td>type_name</td><td>EventTypeName, EventName, AlertName (or sniffed "Message")</td><td><code>events.name</code></td><td>Placeholders like <code>EventType-5000</code> are replaced by the catalogue name. Explicit names (e.g. "High CPU Utilization") are kept.</td></tr>
+<tr><td>message</td><td>Message, Detail, Description, Text, RawDetail (or sniffed long column)</td><td><code>events.message</code></td><td><code>[DEVICE_ID]</code>/<code>[HOSTNAME]</code> replaced by the device name. HTML stripped.</td></tr>
+<tr><td>device_name</td><td>DeviceName, Device, NodeName, Hostname, Caption, SysName</td><td><code>devices.name</code>, <code>events.device_name</code></td><td>Identity is the lower-cased name. Null tokens are dropped and the IP is used when the name is missing.</td></tr>
+<tr><td>ip</td><td>IPAddress, IP, MgmtIP</td><td><code>devices.ip</code>, <code>events.ip</code></td><td>Validated IPv4. Masked values are dropped.</td></tr>
+<tr><td>node_id · machine_type · vendor</td><td>NodeID · MachineType, Model · Vendor, Manufacturer</td><td><code>devices.*</code></td><td>The latest non-empty value wins. NodeID 0 is ignored.</td></tr>
+<tr><td>status_code</td><td>CurrentStatus, Status</td><td><code>events.status_code</code>, <code>devices.last_status</code></td><td>Labelled from <code>[status_codes]</code> (Orion convention).</td></tr>
+<tr><td>location</td><td>Location, SiteAddress, Address</td><td><code>devices.location</code>, <code>sites.address</code></td><td>Underscores become spaces, <code>[ADDRESS]</code> and "LAddress" are removed, and the text is cut at the first line break.</td></tr>
+<tr><td>site_hint</td><td>Site, SiteCode, FEI, Branch, Store (or sniffed digits)</td><td>fallback for <code>site_code</code></td><td>Used only when the device name has no code <i>and</i> the column agrees with names ≥ <code>site_column_min_agreement</code>%.</td></tr>
+<tr><td>severity</td><td>Severity, Priority</td><td><code>events.severity</code></td><td>Used as-is when it is P1–P4. Otherwise the rules decide.</td></tr>
+<tr><td colspan="4"><b>Derived:</b> <code>site_code</code>, <code>category</code>, <code>actionable</code>, <code>transition</code>, <code>pair_key</code>, <code>devices.role</code>, <code>sites.label/city/state</code>, <code>job_id</code>, <code>created_at</code>.</td></tr></table></div>
+
+<h3 id="etl-tickets-map">7.3 Ticket export: source → database</h3>
+<div class="wrap"><table><tr><th>Field</th><th>Accepted headers</th><th>Stored as</th><th>Processing</th></tr>
+<tr><td>number</td><td>number, ticket, incident, sys_id</td><td><code>tickets.number</code> (upsert key)</td><td>Upper-cased. <code>kind</code> is the leading letters (INC, RITM, TASK, CHG or any other prefix).</td></tr>
+<tr><td>state</td><td>state, status</td><td><code>state</code>, <code>is_open</code></td><td>Closed if in <code>etl.closed_states</code>.</td></tr>
+<tr><td>created_at · updated_at · closed_at</td><td>sys_created_on, opened_at · sys_updated_on · closed_at, resolved_at</td><td>ISO timestamps, <code>resolve_minutes</code></td><td>Day-first or month-first is detected from the column (any first part &gt; 12 means day-first). The supplied export is MM-DD-YYYY.</td></tr>
+<tr><td>short_description · description · work_notes · close_notes</td><td>short_description, title · description · work_notes, comments · close_notes, resolution</td><td>same names</td><td>Line endings normalised. Work notes are parsed into timestamped entries with e-mail headers removed.</td></tr>
+<tr><td>opened_by · assigned_to · assignment_group · priority · category · work_notes_list</td><td>usual ServiceNow names and aliases</td><td>same names</td><td>Kept verbatim.</td></tr>
+<tr><td>cmdb_ci</td><td>cmdb_ci, configuration item, affected CI</td><td><code>cmdb_ci</code></td><td>Strongest link (0.98) when it names a known device.</td></tr>
+<tr><td colspan="4"><b>Derived:</b> <code>sites</code> (FEI codes and <code>0412-City-ST</code> names in the text), <code>ips</code>, <code>devices</code> (exact name tokens), <code>resolution</code> (close notes, else the best "fix" sentences, else the latest note on closed tickets).</td></tr></table></div>
+
+<h3 id="etl-dates">7.4 Timestamps</h3>
+<p>Every event must carry its own date and time. Nothing is inferred or generated: a row that cannot be dated is rejected with the reason, and the rest of the file imports.</p>
+<ol>
+<li><b>One order per column.</b> Day-first or month-first is decided once for the whole column. A value with a first part above 12 proves day-first (the supplied export: 69,992 such values in "19-05-2026 20:00"); a second part above 12 proves month-first (ServiceNow's "06-24-2026"). With no proof either way, the reading that gives the tighter date span wins (1–3 May rather than 5 Jan – 5 Mar); a tie uses <code>etl.dates.ambiguous_order</code> (events day-first, tickets month-first). If a column mixes both shapes, rows that prove their own order are read that way and ambiguous ones are rejected.</li>
+<li><b>Every row is checked</b>, and failures land in the rejects file: <i>Missing timestamp</i>, <i>Time without a date</i>, <i>Date without a time</i>, <i>Invalid date</i> (31-02-2026), <i>Date before 2000</i> (<code>earliest_year</code>), <i>Date in the future</i> (beyond <code>future_tolerance_hours</code>, 48).</li>
+<li><b>Time-only files are refused</b> as a whole with a clear message when most values are bare clock times, so a wrong mapping cannot quietly reject a whole export. Mapping Studio warns about this before the import starts and shows the detected order with its evidence.</li>
+<li><b>Precision.</b> The supplied export has minute precision, so several events can share a minute. Everything that orders events (alert lists, outage pairing, timelines, latest node state) breaks ties by EventID. Against the earlier export that carried seconds, EventID order matches the true order for 99.99% of same-minute neighbours (105,888 of 105,898).</li>
+</ol>
+
+<h3 id="etl-reupload">7.5 Re-uploads and duplicates</h3>
+<div class="wrap"><table><tr><th>Case</th><th>Events (by EventID)</th><th>Tickets (by number)</th></tr>
+<tr><td>Same record twice in one file</td><td>First row kept, later copies counted as duplicates</td><td>The row with the latest <code>sys_updated_on</code> wins (file order breaks ties)</td></tr>
+<tr><td>Identical to what is stored</td><td>Skipped, counted as unchanged</td><td>Skipped, counted as unchanged</td></tr>
+<tr><td>Different from what is stored</td><td>Updated (a corrected export). Monitoring events do not change at the source, so this is rare</td><td>Updated when the file's version is newer or equal; state changes (Open → Closed) are counted in the report</td></tr>
+<tr><td>Older than what is stored</td><td>—</td><td>Skipped as older, so an old export never reopens a closed ticket</td></tr>
+<tr><td>No version in the file</td><td>—</td><td>A row without <code>sys_updated_on</code> never replaces a stored ticket that has one (counted as skipped, no updated time)</td></tr>
+<tr><td>Analyst work</td><td colspan="2">Alert states (new, acknowledged, resolved), owners, notes and feedback are never touched by imports</td></tr>
+<tr><td>Device attributes</td><td colspan="2">A file newer than a device's latest stored event refreshes its IP, status, model and location; an older file only fills gaps, so upload order cannot roll a device back</td></tr></table></div>
+<p>Verified on the supplied files: importing events then tickets, tickets then events, and both twice gives identical links (455) and identical device records; the second upload reports 134,385 events and 442 tickets unchanged.</p>
+
+<h3 id="etl-sites">7.6 Sites, devices and roles</h3>
+<ul>
+<li><b>Site code from device name</b> (<code>etl.extract.site_from_device</code>): <code>0412-Dallas-TX-…</code> → 0412, <code>feisw030.ustxhouston1502.int…</code> → 1502, <code>1440A-Apex-NC</code> → 1440. Codes are canonical and zero-padded, so "412" and "0412" are the same site.</li>
+<li><b>Site column trust rule:</b> the unnamed site column in the supplied export matches device names for only 55.7% of devices, so it is ignored there. In the test export it matches 100% and is used as a fallback.</li>
+<li><b>Site label:</b> from device names (<code>Santa-Clara-CA</code> → "Santa Clara, CA") or from location text ("Dallas TX 75201").</li>
+<li><b>Device role:</b> regex rules over name, model and vendor, giving switch, access point, router, firewall, UPS, controller, printer or device. Roles drive icons, playbook wording and simulator choices.</li>
+</ul>
+
+<h3 id="etl-quality">7.7 Quality report and rejects</h3>
+<p>Each finished import stores a report (Data Studio → Report):</p>
+<ul>
+<li>rows read, new, updated, unchanged, skipped as older, rejected and duplicated within the file, plus repaired multi-line fields</li>
+<li>new and updated devices, sites seen</li>
+<li>timestamps: detected order with its evidence, precision, first and last event, days covered; for tickets also stated start times used and ignored, and status changes</li>
+<li>site column agreement and trust</li>
+<li>field coverage meters, ticket kinds and states, linking totals by kind and time evidence</li>
+<li>reject reasons, with the first 1,000 rejected rows downloadable as CSV</li>
+</ul>
+
+<h2 id="classify">8. Classification</h2>
+<p>All rules live in <code>[classification]</code>. They are case-insensitive regular expressions, and the first match wins.</p>
+<div class="wrap"><table><tr><th>Severity</th><th>Meaning</th><th>Matched (on "name :: message")</th></tr>
+<tr><td><span class="pill P4">P4 Info</span></td><td>Recoveries and informational notices</td><td>is up, responding again, restored, recovered, on line, normal, completed, undefined/unknown health, "dropped from above"</td></tr>
+<tr><td><span class="pill P3">P3 Minor</span></td><td>Aggregates and administrative changes</td><td>group … member status, added/removed, unmanaged, renamed, maintenance, admin shutdown, speed changed</td></tr>
+<tr><td><span class="pill P2">P2 Major</span></td><td>Degradation</td><td>hardware warning/critical, CPU, memory, utilisation, packet loss, BGP/OSPF, failover, rogue/disassociated AP, reboot, interface down, warning</td></tr>
+<tr><td><span class="pill P1">P1 Critical</span></td><td>Loss of service</td><td>node down, stopped responding, unreachable, is down, on battery, heartbeat lost, critical, offline</td></tr></table></div>
+<ul>
+<li><b>Category</b> (tried on the event name first, then the message): monitoring, inventory, power, wireless, routing, hardware, performance, interface, connectivity, other. Name-first matters: "Interface Down … Smart APC UPS Management" is an <i>interface</i> event, not a power event.</li>
+<li><b>Actionable</b> = severity in <code>actionable_severities</code> and category not in <code>noise_categories</code> (monitoring, inventory). 45% of the supplied events are actionable.</li>
+<li><b>Transition</b>: the last state word wins ("…changed to DOWN" → down, "…restored to UP" → up). "Uplink" and "UPS" do not count as "up".</li>
+<li><b>Pair key</b>: device plus interface (Gi1/0/46, TenGigabitEthernet1/0/1, Port 24, vni-0/1 …), or device plus "node". This pairs each down with the up that clears it.</li>
+<li><b>Event catalogue</b>: 56 type names were derived from the message patterns in the export (e.g. 5000 Alert Triggered, 604 Thin AP Disappeared, 6808 UPS On Line). Admins can rename types and pin severity or category, and saving re-classifies that type's existing alerts.</li>
+</ul>
+
+<h2 id="linking">9. Ticket linking</h2>
+<div class="wrap"><table><tr><th>Link</th><th>How it is found</th><th>Confidence</th></tr>
+<tr><td>Configuration item</td><td>The ticket's <code>cmdb_ci</code> equals a device name</td><td>0.98</td></tr>
+<tr><td>Device name</td><td>An exact device-name token appears in the text (FQDN or short form)</td><td>0.95</td></tr>
+<tr><td>IP address</td><td>A valid IPv4 in the text equals a device IP (trailing full stops handled, masked IPs ignored)</td><td>0.85</td></tr>
+<tr><td>Site code</td><td><code>FEI 412</code>, <code>FEI0412</code> or <code>1965-Cookeville-TN</code> style names for a known site</td><td>0.60</td></tr></table></div>
+<p>Links are rebuilt for every ticket after each import, so a ticket imported before its devices is linked once the events arrive. Linking is token-based (one pass over each ticket's words), so it scales with ticket volume rather than devices × tickets. With the supplied 30-day exports, 316 of 442 tickets are linked (71%): 48 device links, 37 IP links and 370 site links.</p>
+
+<h3 id="link-time">9.1 Time evidence</h3>
+<p>Alert timing is used to confirm or question a link only where it is real evidence:</p>
+<ul>
+<li><b>Incident anchor.</b> Many tickets state when the incident began ("Start time: 07/08/26 1:19 AM"). In the supplied tickets 72 do; their gap to the ticket opening is 0.1–11.4 h for nearly all (median about 2.5 h), which shows both use the same clock. A stated start is trusted only between <code>stated_start_max_hours_before</code> (24 h) before and <code>stated_start_max_minutes_after</code> (15 min) after the opening; 66 qualify, and 6 are ignored (start 3–8 h after opening, 43 h or a month earlier, one dated December). Without a usable start, the opening time is the anchor.</li>
+<li><b>Confirmation.</b> A P1–P3 alert on the linked device (or, for site links, at the site) within ±<code>start_window_minutes</code> (60) of a stated start, or from <code>confirm_hours_before</code> (24 h) before to <code>confirm_hours_after</code> (2 h) after the opening, confirms the link: +<code>confirmed_bonus</code> (0.15, capped at 0.99) and the alert is shown on the ticket.</li>
+<li><b>Silence.</b> When imported events cover the whole window and show nothing, a site-only link drops to <code>site_without_alerts</code> (0.45). Device links keep their confidence, since a device named in the text is strong evidence on its own.</li>
+<li><b>No coverage.</b> Days without imported events say nothing, so links there keep their text-based confidence. Recommendations do the same: when an alert falls outside the period the tickets cover, ticket timing is left out and the link and wording weights are rescaled (0.5 and 0.3 become 0.625 and 0.375), instead of every ticket losing 20 points for being "far away".</li>
+</ul>
+<p>On the supplied exports the tickets (12 Jun – 13 Jul) and events (26 Apr – 19 May) do not overlap, so all 455 links are "outside event data". A constant shift between the two exports was ruled out before deciding this: for device-linked tickets, the day gaps to their devices' critical alerts spread evenly from 40 to 68 days, with the most common gap holding only 14% of tickets, and the ticket work notes cite June and July dates more than 1,500 times. Aligning one export to the other would therefore invent dates, so it is not done. Data Studio shows both ranges and flags when they do not overlap.</p>
+
+<h3 id="resync">9.2 Resync</h3>
+<p>Data Studio → <b>Resync</b> (and the end of every import and purge) rebuilds everything derived from the stored data: device counters, latest status and IP from each device's newest event, the site registry, all ticket links with their time evidence, and the search indexes. Events alone, tickets alone, both in either order, re-uploads and purges all end in the same state. Tickets uploaded before any events have nothing to link to yet; the resync report counts those that name sites with no events (59 for the supplied tickets once events are in, 367 when tickets are loaded alone) and they link as soon as those events arrive. A resync of the supplied data takes under a second.</p>
+
+<h2 id="correlation">10. Correlation and health</h2>
+<ul>
+<li><b>Outages:</b> the first "down" of a streak opens an outage and the next "up" with the same pair key closes it. Duration feeds the median time to recover (MTTR) and P90. A down with no matching up counts as "still down".</li>
+<li><b>Flapping:</b> at least <code>flap_threshold</code> (3) closed outages of ≤ <code>flap_window_minutes</code> (60) on one device.</li>
+<li><b>Blast radius:</b> other devices at the same site with a "down" within ±<code>blast_radius_minutes</code> (15). This drives the "site-level disruption" hypothesis and the single parent ticket advice.</li>
+<li><b>Recurrence:</b> the same event type on this device and at this site over the last 7 days, plus the device's hour-of-day profile.</li>
+<li><b>Health score</b> (0–100) over <code>health_window_days</code> up to the device's latest activity: <code>100 × e^(−penalty/60)</code>, where penalty = 8·P1 + 4·P2 + 1·P3 + 6·flap cycles + 5·open tickets. Grades: Healthy ≥ 80, Watch ≥ 55, Degraded ≥ 30, otherwise Critical.</li>
+</ul>
+
+<h2 id="recommend">11. Recommendations (built-in engine)</h2>
+<p>Ticket candidates come from three places: links to the device, links to its site (including tickets about other devices at the same site), and an FTS5 query built from specific words in the alert, with generic words such as "lost", "node" and "status" removed. Each candidate is scored (diagram 4.2) and shown with readable reasons: "names this device", "mentions site 0412", "shares dallas, switch, uplink", "opened 0 min after this alert", "marked helpful by analysts 2×".</p>
+<p>The plan combines several parts:</p>
+<ul>
+<li>A hypothesis chosen by evidence priority.</li>
+<li>An <i>avoid duplicate</i> step when an open INC is tied to the device, or to the site at the same time.</li>
+<li>Correlation steps for site-wide drops and flapping.</li>
+<li>The category playbook from <code>[playbooks]</code>, with device, IP, site and interface filled in.</li>
+<li>"Worked in INC…" steps from strong matches (score ≥ <code>min_fix_score</code>).</li>
+</ul>
+<p>Each step shows its source. Analyst feedback ("this ticket helped") boosts that ticket for the same device or event type in later triage.</p>
+
+<h2 id="ai">12. Gemini integration and caching</h2>
+<table><tr><th>Setting</th><th>Effect</th></tr>
+<tr><td><code>mode = "auto"</code></td><td>Gemini answers during triage for <code>auto_severities</code> (P1, P2 by default). Other alerts get the engine and an <b>Ask AI</b> button.</td></tr>
+<tr><td><code>mode = "on_demand"</code></td><td>The engine answers, and Gemini runs only when someone selects <b>Ask AI</b>.</td></tr>
+<tr><td><code>mode = "off"</code></td><td>Engine only.</td></tr></table>
+<ol>
+<li><b>Grounding:</b> the prompt contains only this alert, its device and site, the engine's evidence, the outage pairing, recent device events, the check verdict and the five best matching tickets with what fixed them. The model must cite which tickets it used, and ticket numbers it invents are discarded.</li>
+<li><b>Fingerprint and cache:</b> a SHA-1 of that evidence (plus the model) is the key in <code>ai_insights</code>. The same evidence within <code>cache_hours</code> is answered from the database with no provider call, and the hit count is recorded. New tickets, a different check verdict or new correlated events produce a new fingerprint and therefore a fresh answer.</li>
+<li><b>One call per key:</b> concurrent requests for the same evidence wait for the first call instead of duplicating it.</li>
+<li><b>Refresh:</b> <b>Refresh AI answer</b> ignores the cache, replaces the saved answer and is audited.</li>
+<li><b>Merge:</b> the AI hypothesis and steps (each with its "why") go on top. Avoid-duplicate and proven-fix steps from the engine are kept. Confidence is 60% AI level (high 85, medium 65, low 40) and 40% engine. The work note states that it was AI-assisted. "Compare with the built-in engine's view" shows the engine's hypothesis.</li>
+<li><b>Fallback:</b> a missing key, AI switched off, an HTTP error (bad key, model or rate limit), a timeout or an unreadable reply all return the engine plan labelled <b>Fallback: built-in engine</b>, with the reason in plain words.</li>
+</ol>
+<table><tr><th>Label</th><th>Meaning</th></tr>
+<tr><td>AI analysis, Gemini 2.5 Flash</td><td>This answer was written by the model named.</td></tr>
+<tr><td>Based on INC…</td><td>The past incidents the AI relied on. "Based on this alert's evidence only" when none matched well enough.</td></tr>
+<tr><td>Saved answer, 12 min ago</td><td>Reused from the database because the evidence has not changed. No AI cost.</td></tr>
+<tr><td>Fresh answer, 1.2 s / Refreshed answer</td><td>Generated just now and saved for next time.</td></tr>
+<tr><td>Fallback: built-in engine</td><td>AI was expected but could not be used. The reason is shown above the plan.</td></tr>
+<tr><td>Built-in engine</td><td>Rules, correlation and ticket history only. AI was not requested.</td></tr></table>
+
+<h2 id="diag">13. Preliminary checks</h2>
+<p><code>[diagnostics] mode</code>:</p>
+<ul>
+<li><b>simulated</b> (default): deterministic results that follow the device's last known node state. A device whose last node event is "down" fails ping, its traceroute stops at the site gateway and its ports are closed. Results carry a striped "Simulated results" badge and say so in the work note.</li>
+<li><b>live</b>: runs <code>ping</code> and <code>traceroute</code> (or <code>tracert</code> on Windows) as subprocesses without a shell, does DNS in Python, and checks TCP ports (<code>tcp_ports</code>) with socket connects. Hosts are validated against a strict IPv4/hostname pattern before anything runs, and every check has a hard timeout.</li>
+</ul>
+<p>Results are cached per host and state for <code>cache_seconds</code>. In live mode, ad-hoc checks (<code>POST /api/diagnostics</code>) only target device IPs and names in the inventory while <code>adhoc_known_hosts_only</code> is true (the default), so the console cannot be used to probe arbitrary hosts.</p>
+
+<h2 id="sim">14. Simulation</h2>
+<table><tr><th>Scenario</th><th>What it sends</th></tr>
+<tr><td>Random alerts</td><td>N alerts on up to 60 real devices, with event types picked to fit each device's role</td></tr>
+<tr><td>Site outage cascade</td><td>Router, switches, UPS and APs at one site (4–30 devices) go down within seconds, then half recover. Triage shows the blast radius.</td></tr>
+<tr><td>Flapping interface</td><td>One switch port goes down and up 3–8 times, which trips the flapping signal</td></tr>
+<tr><td>Power event</td><td>UPS on battery, PSU critical, node down, UPS on line, node up</td></tr>
+<tr><td>WAN failover</td><td>BGP primary down, packet loss alert, BGP restored</td></tr></table>
+<p>Simulated alerts use <code>source='simulation'</code> and custom ones <code>source='custom'</code>. Both are classified, indexed, streamed and triaged exactly like imports, and can be purged in one step. Custom alerts can create a new device; its site is taken from the name or typed.</p>
+
+<h2 id="live">15. Live stream</h2>
+<p><code>GET /api/stream</code> is a Server-Sent Events channel with a heartbeat every <code>live.heartbeat_seconds</code>.</p>
+<table><tr><th>Topic</th><th>Payload</th><th>Used by</th></tr>
+<tr><td>alert</td><td>The new alert card</td><td>Console (slides in), simulator feed, Live badge, P1 toasts, dashboard refresh</td></tr>
+<tr><td>alert_state</td><td>id, state, owner</td><td>Console cards, triage header</td></tr>
+<tr><td>job</td><td>id, status, progress, stage, message</td><td>Data Studio progress bars</td></tr>
+<tr><td>data</td><td>reason (import, catalog, purge)</td><td>Dashboard refresh</td></tr>
+<tr><td>sim</td><td>scenario progress</td><td>Simulator</td></tr></table>
+
+<h2 id="schema">16. Database</h2>
+<div class="wrap"><table><tr><th>Table</th><th>Purpose</th><th>Key columns</th></tr>
+<tr><td>events</td><td>Every alert</td><td>id, source, source_id (unique per source), ts, type_id, name, message, device_id, device_name, ip, site_code, status_code, severity, category, actionable, transition, pair_key, state, owner, state_note, state_at, job_id, extra</td></tr>
+<tr><td>devices</td><td>Inventory</td><td>name_key (unique), name, ip, node_id, site_code, role, machine_type, vendor, location, first_seen, last_seen, last_status, event_count</td></tr>
+<tr><td>sites</td><td>Sites / FEI branches</td><td>code (zero-padded), label, city, state, address</td></tr>
+<tr><td>event_types</td><td>Catalogue and admin overrides</td><td>type_id, name (override), source_name, severity, category, sample</td></tr>
+<tr><td>tickets</td><td>Service-desk history</td><td>number (unique), kind, state, is_open, dates, resolve_minutes, texts, cmdb_ci, resolution, sites/ips/devices (JSON), extra</td></tr>
+<tr><td>ticket_links</td><td>Ticket ↔ inventory bridge</td><td>ticket_id, kind (ci/device/ip/site), value, device_id, site_code, confidence</td></tr>
+<tr><td>events_fts, tickets_fts</td><td>FTS5 indexes (external content)</td><td>name/message/device · number/descriptions/notes</td></tr>
+<tr><td>jobs, job_rejects</td><td>Imports and their rejects</td><td>status, progress, stage, preview, mapping, options, stats</td></tr>
+<tr><td>ai_insights</td><td>Cached Gemini answers</td><td>cache_key (evidence fingerprint), event_id, model, payload, latency_ms, hits</td></tr>
+<tr><td>feedback</td><td>Learning loop</td><td>event_id, username, verdict, ticket_number</td></tr>
+<tr><td>users, sessions, audit_log, meta</td><td>Access, sign-ins, trail, data version</td><td>scrypt password hash, must_change, active · session id, user, expiry · who, what, target, IP</td></tr></table></div>
+<p>Indexes cover the console's access paths: time, device and time, site and time, severity and time, type, state, IP, actionable and time, and pair key. Most are <i>covering</i> (they hold every column the query reads), so dashboard aggregates, alert facet counts, outage pairing and site roll-ups read an index instead of visiting each row. The dashboard is built from two scans of the window (an hourly roll-up and a device × site roll-up) rather than one scan per chart. Planner statistics are refreshed (<code>PRAGMA optimize</code>) at the end of every resync.</p>
+<p><b>Query cache</b> (<code>app/cache.py</code>): derived results are cached under the current data version, which every write that changes what screens show increments (imports, resync, purges, catalogue edits, alert state changes, feedback, simulated and custom alerts). A cached value is therefore never stale, and because the version lives in the database this holds across several app processes. Cached: the dashboard, alert-console totals and facet counts (reused across pages and sorts of the same filter), triage stages 2, 3 and 5 per alert, device counts, the sites list, site profiles, Data Studio summary and catalogue figures, simulator options and ticket date ranges. Concurrent requests for the same missing value share one computation; the cache holds at most 512 entries, and Admin → Settings shows its entries, hits, misses and hit rate.</p>
+
+<h2 id="api">17. API reference</h2>
+<p>The interactive OpenAPI explorer is at <code>/api/docs</code> (signed in). Every endpoint except login and health needs a session, and every write needs the <code>X-CSRF-Token</code> header from the page's <code>csrf</code> meta tag. Errors return <code>{"error": "…"}</code> with a plain-language message.</p>
+<div class="wrap"><table><tr><th>Method and path</th><th>Capability</th><th>Purpose</th></tr>
+<tr><td>POST /api/auth/login · logout · password · GET me</td><td>— / signed in</td><td>Session lifecycle (5 failed attempts lock that username from that address for 5 minutes; 20 from one address lock the address). Logout ends the session on the server; a password change ends every other session</td></tr>
+<tr><td>GET /api/insights/overview?window=24h|7d|30d|all</td><td>view_dashboard</td><td>All dashboard aggregates with previous-period comparison</td></tr>
+<tr><td>GET /api/alerts</td><td>view_alerts</td><td>q, severity, category, state, source (comma lists), actionable, window, site, device_id, type_id, hour, sort, page, size → items, total, facets</td></tr>
+<tr><td>GET /api/alerts/export.csv</td><td>export_data</td><td>Same filters, up to 100,000 rows</td></tr>
+<tr><td>GET /api/alerts/{id} · /analysis · /history</td><td>view_alerts / investigate</td><td>Triage stages 1–3</td></tr>
+<tr><td>POST /api/alerts/{id}/checks</td><td>run_diagnostics</td><td>Stage 4</td></tr>
+<tr><td>GET /api/alerts/{id}/recommendation</td><td>investigate</td><td>Stage 5: engine, plus AI in auto mode (cached)</td></tr>
+<tr><td>POST /api/alerts/{id}/ai {refresh}</td><td>ai_refine</td><td>Ask AI now, or refresh the saved answer</td></tr>
+<tr><td>POST /api/alerts/{id}/state · /bulk-state · /feedback</td><td>update_alert_state / give_feedback</td><td>Ownership and the learning loop</td></tr>
+<tr><td>GET /api/devices · /devices/{id} · /sites · /sites/{code} · /tickets · /tickets/{number}</td><td>view_inventory / view_tickets</td><td>Lists with filters, and profiles</td></tr>
+<tr><td>GET /api/search?q=</td><td>view_alerts</td><td>Command palette: devices, sites, tickets, alerts</td></tr>
+<tr><td>GET /api/stream</td><td>signed in</td><td>Server-Sent Events</td></tr>
+<tr><td>POST /api/diagnostics {host}</td><td>run_diagnostics</td><td>Ad-hoc checks</td></tr>
+<tr><td>GET /api/sim/options · status · POST run · stop · custom · preview</td><td>simulate / trigger_custom_alert</td><td>Simulator</td></tr>
+<tr><td>POST /api/data/uploads · GET jobs · GET/DELETE jobs/{id} · POST jobs/{id}/run · cancel · GET rejects.csv</td><td>ingest_data</td><td>Import lifecycle</td></tr>
+<tr><td>GET /api/data/catalog · PUT catalog/{type_id}</td><td>manage_catalog</td><td>Event catalogue</td></tr>
+<tr><td>POST /api/data/resync · purge {scope, confirm:"PURGE"} · GET summary</td><td>ingest_data / purge_data</td><td>Housekeeping</td></tr>
+<tr><td>GET/POST /api/admin/users · PATCH users/{id} · POST users/{id}/reset · GET audit · GET settings</td><td>manage_users / view_audit / view_settings</td><td>Administration</td></tr>
+<tr><td>GET /api/health</td><td>public</td><td>Liveness, event count, data version</td></tr></table></div>
+
+<h2 id="config">18. Configuration reference (<code>nocturne.toml</code>)</h2>
+<div class="wrap"><table><tr><th>Section</th><th>Keys</th><th>Notes</th></tr>
+<tr><td>[app]</td><td>name, tagline, organisation, host, port, page_size</td><td>Branding text and listen address</td></tr>
+<tr><td>[storage]</td><td>database, uploads, max_upload_mb</td><td>Paths are relative to the project root</td></tr>
+<tr><td>[security]</td><td>secret_key_env, admin_username, admin_password_env, session_hours, login_max_attempts, login_ip_multiplier, login_lockout_minutes, password_min_length, cookie_secure</td><td>Secrets are named by environment variable, never stored</td></tr>
+<tr><td>[roles], [permissions]</td><td>role → label; capability → list of roles</td><td>See section 5</td></tr>
+<tr><td>[diagnostics]</td><td>mode, ping_count, timeout_seconds, traceroute_hops, tcp_ports, cache_seconds, adhoc_known_hosts_only</td><td>simulated or live</td></tr>
+<tr><td>[ai]</td><td>enabled, mode, auto_severities, provider, model, api_key_env, endpoint, timeout_seconds, cache_hours</td><td>See section 12</td></tr>
+<tr><td>[live], [simulation]</td><td>heartbeat_seconds; default_count, default_interval_ms, max_count</td><td></td></tr>
+<tr><td>[correlation]</td><td>flap_window_minutes, flap_threshold, blast_radius_minutes, timeline_hours, health_window_days, health_weights</td><td>Section 10</td></tr>
+<tr><td>[recommend]</td><td>max_tickets, weight_link/text/time, time_before/after_hours, resolved_bonus, min_score, min_shared_terms, min_fix_score, dedupe_kinds, resolution_keywords</td><td>Section 11</td></tr>
+<tr><td>[linking]</td><td>ci, device_name, ip_address, site_code</td><td>Link confidences</td></tr>
+<tr><td>[etl]</td><td>batch_size, max_rejects_kept, site_column_min_agreement, null_tokens, closed_states; [etl.events.aliases]; [etl.tickets.aliases]; [etl.dates]; [etl.extract]</td><td>Section 7. Add an alias to support a new export without code changes.</td></tr>
+<tr><td>[classification]</td><td>severity_labels, actionable_severities, noise_categories, default_severity, down/up patterns, [[severity]], [[category]], [[device_role]]</td><td>Section 8</td></tr>
+<tr><td>[event_types], [status_codes], [playbooks]</td><td>id → name; code → label; category → steps</td><td>Catalogue defaults, status labels, response playbooks</td></tr></table></div>
+
+<h2 id="security">19. Security</h2>
+<ul>
+<li>Passwords: scrypt (N=2¹⁴), at least 10 characters mixing three character classes, forced change for new and reset accounts. Repeated failures lock the username from that client address (so nobody can lock a colleague out from elsewhere) and cap guessing across usernames from one address; unknown usernames take as long to refuse as wrong passwords.</li>
+<li>Sessions: recorded server-side; the signed, HTTP-only, SameSite=Lax cookie carries only the session id and expires after 12 hours. Signing out ends the session at once; changing a password ends every other session; an administrator's reset or disable ends all of that user's sessions. The user is re-checked as active on every request. Set <code>cookie_secure = true</code> behind HTTPS.</li>
+<li>CSRF: a per-session token is required in the header on every write.</li>
+<li>Authorisation: capability checks on every API endpoint and page. At least one active administrator is always kept.</li>
+<li>Input safety: parameterised SQL throughout, sanitised upload names, strict host validation before diagnostics, no shell execution, HTML-escaped rendering, malformed filter values refused with 400. CSV exports prefix cells that start with = + - @ so spreadsheets show them instead of running them.</li>
+<li>Headers: Content-Security-Policy (same-origin resources only, no framing), nosniff, frame denial, same-origin referrer, no-store on the API. The client address in the audit trail is the connecting address; <code>X-Forwarded-For</code> is applied only for proxies trusted by uvicorn's <code>--forwarded-allow-ips</code>.</li>
+<li>Audit: sign-ins (including failures and throttled attempts), imports, cancelled imports, purges, catalogue edits, state changes, exports, diagnostics, simulations, AI refreshes and user changes.</li>
+<li>AI: only alert evidence and ticket summaries are sent; credentials, users and audit data never are. The key is read from the environment.</li>
+</ul>
+<div class="note warn">For shared deployments, put NOCTURNE behind HTTPS (reverse proxy) and set <code>NOCTURNE_SECRET_KEY</code> and <code>NOCTURNE_ADMIN_PASSWORD</code>.</div>
+
+<h2 id="ops">20. Operations and scaling</h2>
+<ul>
+<li><b>Performance</b>, measured on a synthetic export the size of the supplied one (134,000 events, 5,918 devices, 442 tickets, 28 MB): import about 8 s, resync about 0.3 s. Dashboard "All" 0.33 s cold (was 1.1 s) and about 3 ms cached; alert list with facets 37 ms on the first view of a filter and about 3 ms when paging (was 190 ms); devices list about 4 ms (was 1.2 s); sites list 76 ms cold, 2 ms cached (was 140 ms); triage recommendation about 3 ms (was 0.64 s, which included a 0.6 s display pause now applied only to the visible checks stage). JSON responses are gzip-compressed (the live stream never is); fonts and images are cached by browsers and CSS/JS revalidate with ETags.</li>
+<li><b>Backups:</b> copy <code>data/nocturne.db</code> (WAL mode is safe to copy with SQLite's backup API or while the service is stopped) and <code>data/uploads</code>.</li>
+<li><b>Restarts:</b> queued imports resume. Running ones are marked "interrupted" and re-run with one click, and upserts make re-runs safe.</li>
+<li><b>Scaling path:</b> the services are stateless apart from <code>bus.py</code> (in-process pub/sub) and <code>runner.py</code> (one worker thread). For several app instances, swap the bus for Redis pub/sub and the runner for a queue worker, and move SQL to PostgreSQL (replacing FTS5 with tsvector). Routers and services stay the same.</li>
+<li><b>Troubleshooting:</b>
+  <ul>
+    <li>A wrong mapping can be fixed in Mapping Studio, then use "Run again".</li>
+    <li>If dates look wrong, choose "Newest day is the date on the right" with the correct date.</li>
+    <li>For few ticket links, check the quality report's "mentions_*" coverage and add site patterns in <code>[etl.extract]</code>.</li>
+    <li>If AI shows Fallback, read the reason shown above the plan.</li>
+  </ul></li>
+</ul>
+
+<h2 id="dataquality">21. Findings on the supplied exports</h2>
+<div class="wrap"><table><tr><th>Finding</th><th>Handling</th></tr>
+<tr><td>EventTime is DD-MM-YYYY HH:MM (minute precision)</td><td>Day-first proven by 69,992 values; 26 Apr – 19 May 2026, 24 days; same-minute ties ordered by EventID</td></tr>
+<tr><td>The "Message" header holds the event-type name; the real text sits in an unnamed column</td><td>Detected by content and mapped automatically</td></tr>
+<tr><td>Unnamed site column agrees with device-name codes for only 55.7% of devices</td><td>Ignored for this file. Codes are taken from device names (5,864 of 6,548 devices)</td></tr>
+<tr><td>31 rows with no EventID</td><td>Rejected, listed in the report, downloadable</td></tr>
+<tr><td>27 rows whose Location swallowed later records (broken quoting)</td><td>Location cut at the first line break; the row is kept</td></tr>
+<tr><td>Placeholders: <code>[HOSTNAME]</code>, <code>[ADDRESS]</code>, <code>[IP_ADDRESS]</code>, "LAddress", "Unknown", "NULL"</td><td>Treated as missing (<code>etl.null_tokens</code>); <code>[DEVICE_ID]</code> in messages replaced by the device name</td></tr>
+<tr><td>Generic event types (EventType-5000 …)</td><td>56 named from message patterns; unseen types keep EventType-N plus a sample message</td></tr>
+<tr><td>Ticket export is Windows-1252; opened_by and assigned_to are empty</td><td>Decoded correctly; fields kept and shown when present (the test export fills them)</td></tr>
+<tr><td>Tickets (12 Jun – 13 Jul 2026) post-date events (26 Apr – 19 May 2026); no constant shift between them</td><td>Timing is left out rather than counted against matches; links and wording rank history. Time evidence switches on automatically for overlapping exports (the test files overlap on 9 Oct 2026)</td></tr>
+<tr><td>72 tickets state an incident start; some write "21:22 PM" or impossible values</td><td>66 used as the incident anchor after validation; 6 ignored and counted</td></tr></table></div>
+
+<h2 id="code">22. Code map</h2>
+<pre>nocturne/
+├── nocturne.toml            the single configuration file
+├── run.py                   start the server
+├── requirements.txt
+├── app/
+│   ├── config.py            TOML + env overrides → cfg
+│   ├── db.py · schema.sql   SQLite helpers, schema, FTS, data version, audit
+│   ├── security.py          passwords, sessions, CSRF, capabilities
+│   ├── bus.py               live-stream publish/subscribe
+│   ├── cache.py             query cache keyed by the data version
+│   ├── web.py               app factory, middleware, page routes
+│   ├── api/                 auth · alerts · inventory · ops · data · admin
+│   └── services/
+│       ├── etl/             readers · mapping · timeparse · events · tickets · linker · runner
+│       ├── classify.py      severity, category, transition, pair key, role
+│       ├── textmine.py      sites, IPs, devices, work notes, fixes, query terms
+│       ├── correlate.py     outages, flapping, blast radius, timeline, health
+│       ├── analytics.py     dashboard aggregates
+│       ├── recommend.py     ticket ranking, response plan, work note
+│       ├── ai.py            Gemini: grounding, fingerprint cache, merge, fallback
+│       ├── diagnostics.py   simulated and live checks
+│       └── simulator.py     scenarios and custom alerts
+├── web/templates · web/static (css, js, fonts, img)
+├── docs/NOCTURNE-Guide.html this guide (also served at /guide)
+├── samples/                 small event and ticket test exports
+└── tests/                   pytest suite</pre>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,401 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  NOCTURNE · the single configuration file
+#  Every tunable lives here. Secrets are never written here: they are read from
+#  the environment variables named below (see README → Configuration).
+#  Any value can also be overridden with an env var:  NOCTURNE__SECTION__KEY=value
+# ─────────────────────────────────────────────────────────────────────────────
+
+[app]
+name         = "NOCTURNE"
+tagline      = "Network alert triage for the NOC"
+organisation = "Ferguson Enterprises"
+host         = "0.0.0.0"
+port         = 8080
+page_size    = 24          # cards per page in alert, device and ticket views
+
+[storage]
+database      = "data/nocturne.db"
+uploads       = "data/uploads"
+max_upload_mb = 250
+
+[security]
+secret_key_env             = "NOCTURNE_SECRET_KEY"      # unset → generated once into data/.secret
+admin_username             = "admin"
+admin_password_env         = "NOCTURNE_ADMIN_PASSWORD"  # unset → "ChangeMe@2026", forced change at first login
+session_hours              = 12
+login_max_attempts         = 5                          # per username and client address within the lockout window
+login_ip_multiplier        = 4                          # one client address may fail max_attempts × this across all usernames
+login_lockout_minutes      = 5
+password_min_length        = 10
+cookie_secure              = false                      # true when served over HTTPS (reverse proxy): the session cookie is then sent only over TLS
+
+# ── Roles & permissions ─────────────────────────────────────────────────────
+# Two roles ship by default. Add a role by adding a label and listing it on capabilities.
+[roles]
+admin = "Administrator"
+user  = "NOC Analyst"
+
+[permissions]
+view_dashboard       = ["admin", "user"]
+view_alerts          = ["admin", "user"]
+investigate          = ["admin", "user"]
+run_diagnostics      = ["admin", "user"]
+update_alert_state   = ["admin", "user"]
+give_feedback        = ["admin", "user"]
+export_data          = ["admin", "user"]
+ai_refine            = ["admin", "user"]
+view_inventory       = ["admin", "user"]
+view_tickets         = ["admin", "user"]
+simulate             = ["admin"]
+trigger_custom_alert = ["admin"]
+ingest_data          = ["admin"]
+manage_catalog       = ["admin"]
+purge_data           = ["admin"]
+manage_users         = ["admin"]
+view_audit           = ["admin"]
+view_settings        = ["admin"]
+
+# ── Preliminary checks ──────────────────────────────────────────────────────
+[diagnostics]
+mode              = "simulated"   # "simulated" (safe demo, clearly labelled) | "live" (runs ping/traceroute/DNS/TCP from this server)
+ping_count        = 4
+timeout_seconds   = 8
+traceroute_hops   = 15
+tcp_ports         = [22, 443]
+cache_seconds     = 60
+adhoc_known_hosts_only = true     # live mode: ad-hoc checks only target device IPs/names in the inventory (no probing of arbitrary hosts)
+
+# ── Optional AI refinement (the built-in engine works without it) ───────────
+[ai]
+enabled         = true
+mode            = "auto"            # "auto": Gemini answers during triage for the severities below | "on_demand": only when asked | "off"
+auto_severities = ["P1", "P2"]      # other alerts get the built-in engine plus an "Ask AI" button
+provider        = "gemini"
+model           = "gemini-2.5-flash"
+api_key_env     = "GEMINI_API_KEY"
+endpoint        = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+timeout_seconds = 25
+cache_hours     = 24                # answers are reused while the evidence is unchanged and younger than this
+
+# ── Live stream & simulation ────────────────────────────────────────────────
+[live]
+heartbeat_seconds = 15
+
+[simulation]
+default_count       = 12
+default_interval_ms = 900
+max_count           = 300
+
+# ── Correlation & scoring ───────────────────────────────────────────────────
+[correlation]
+flap_window_minutes   = 60     # down→up cycles inside this window count towards flapping
+flap_threshold        = 3      # cycles needed to flag a device as flapping
+blast_radius_minutes  = 15     # other devices at the same site alerting within ± this window
+timeline_hours        = 24     # device timeline shown around an alert
+health_window_days    = 7
+health_weights        = { P1 = 8, P2 = 4, P3 = 1, P4 = 0, flap = 6, open_ticket = 5 }
+
+[recommend]
+max_tickets          = 8
+weight_link          = 0.50    # how strongly a device/IP/site link counts
+weight_text          = 0.30    # full-text similarity between the alert and the ticket
+weight_time          = 0.20    # ticket opened close in time to the alert
+time_before_hours    = 2       # ticket opened up to N h before the alert still counts as "same incident"
+time_after_hours     = 24
+resolved_bonus       = 0.06    # closed tickets that carry notes are better teachers
+min_score            = 0.12
+min_shared_terms     = 2       # a ticket matched on wording alone must share at least this many specific words
+min_fix_score        = 35      # only tickets scoring at least this (0–100) contribute "proven fix" steps and timings
+dedupe_kinds         = ["INC"]  # open tickets of these kinds, tied to the same device (or site at the same time), trigger "update instead of duplicating"
+resolution_keywords  = ["replaced", "replace", "rebooted", "reboot", "reseat", "power cycle", "power cycled", "poe cycle",
+                        "restored", "resolved", "fixed", "repaired", "isp", "carrier", "circuit", "dispatched",
+                        "on-site", "onsite", "technician", "upgraded", "firmware", "reconfigured", "re-patched",
+                        "cable", "patch", "swapped", "rma", "cleared", "bounced", "shut/no shut", "failover",
+                        "back up", "back online", "came back", "come up", "came up", "up and running", "stable", "working fine",
+                        "up now", "completed", "template updated", "restarted", "replaced the"]
+
+# Confidence given to each way a ticket can be tied to the inventory.
+[linking]
+ci          = 0.98   # the ticket's configuration-item field names the device
+device_name = 0.95   # the device name appears in the ticket text
+ip_address  = 0.85   # one of the device's IPs appears in the ticket text
+site_code   = 0.60   # the ticket mentions the device's site / FEI code
+# Time evidence, used only where imported events cover the ticket's opening (otherwise the link keeps its text-based score).
+confirm_hours_before = 24    # a P1–P3 alert on the linked device/site up to N h before the ticket opened confirms the link
+confirm_hours_after  = 2     # …or up to N h after it (alert raised late, ticket raised early)
+confirmed_bonus      = 0.15  # added to a confirmed link, capped at 0.99
+site_without_alerts  = 0.45  # site-only link where events cover the window but the site had no alerts
+start_window_minutes = 60    # when the ticket states its incident start ("Start time: …"), alerts within ±N min of it confirm
+
+# ── Data import (ETL) ───────────────────────────────────────────────────────
+[etl]
+batch_size        = 5000
+max_rejects_kept  = 1000
+site_column_min_agreement = 80   # % of devices whose site column matches the code in their name before that column is trusted
+null_tokens       = ["", "null", "nan", "none", "n/a", "na", "-", "unknown", "[hostname]", "[device_id]", "[address]", "[ip_address]", "laddress"]
+# A start time written in a ticket ("Start time: 07/08/26 1:19 AM") is trusted only this close to the ticket's opening;
+# outside it the value is a typo or a different time zone and the opening time is used instead.
+stated_start_max_hours_before = 24
+stated_start_max_minutes_after = 15
+closed_states     = ["closed", "closed complete", "closed incomplete", "closed skipped", "resolved", "cancelled", "canceled"]
+
+# Header aliases. Matching ignores case, spaces, underscores and punctuation.
+# Columns that match nothing are still kept, row by row, in each record's "extra" field.
+[etl.events.aliases]
+source_id    = ["eventid", "id", "alertid", "event_number", "eventno"]
+time         = ["eventtime", "eventdatetime", "eventtimestamp", "time", "timestamp", "datetime", "occurred", "occurredat", "triggeredat", "detectedat", "receivedat", "logtime"]
+date         = ["eventdate", "date", "day"]
+type_id      = ["eventtype", "eventtypeid", "typeid", "alerttypeid"]
+type_name    = ["eventtypename", "typename", "eventname", "alertname", "alerttype"]
+message      = ["message", "eventmessage", "detail", "details", "description", "text", "alertmessage", "rawdetail"]
+node_id      = ["nodeid", "node"]
+device_name  = ["devicename", "device", "nodename", "hostname", "host", "caption", "sysname"]
+ip           = ["ipaddress", "ip", "ipaddr", "address_ip", "managementip", "mgmtip"]
+machine_type = ["machinetype", "model", "devicetype", "platform", "hardware"]
+vendor       = ["vendor", "manufacturer", "make"]
+status_code  = ["currentstatus", "status", "statuscode", "nodestatus"]
+location     = ["location", "siteaddress", "address", "syslocation"]
+site_hint    = ["site", "sitecode", "sitenumber", "fei", "branch", "store", "branchcode"]
+severity     = ["severity", "priority"]
+
+[etl.tickets.aliases]
+number            = ["number", "ticket", "ticketnumber", "id", "incident", "sysid"]
+state             = ["state", "status", "incidentstate"]
+priority          = ["priority", "severity", "urgency", "impact"]
+opened_by         = ["openedby", "caller", "callerid", "createdby", "requestedby"]
+created_at        = ["syscreatedon", "createdon", "opened", "openedat", "created", "createdat", "opendate"]
+updated_at        = ["sysupdatedon", "updatedon", "updated", "updatedat", "lastupdated"]
+closed_at         = ["closedat", "closed", "resolvedat", "resolved", "closedate"]
+assignment_group  = ["assignmentgroup", "group", "team", "queue"]
+assigned_to       = ["assignedto", "assignee", "owner", "resolvedby"]
+short_description = ["shortdescription", "title", "summary", "subject"]
+description       = ["description", "details", "body"]
+work_notes        = ["worknotes", "notes", "comments", "activity", "journal"]
+work_notes_list   = ["worknoteslist", "watchlist", "worknoteswatchlist"]
+close_notes       = ["closenotes", "resolutionnotes", "resolution", "closecode", "fix"]
+category          = ["category", "subcategory", "type"]
+cmdb_ci           = ["cmdbci", "configurationitem", "ci", "affectedci", "device", "devicename"]
+
+[etl.dates]
+# Every event row must carry a full date and time; rows that fail these checks are rejected with the reason.
+ambiguous_order        = { events = "day_first", tickets = "month_first" }  # only when no value proves the order and both readings span the same days
+earliest_year          = 2000         # older dates are treated as broken values
+future_tolerance_hours = 48           # allows for time-zone differences between the export and this server
+
+# Regular expressions used to pull facts out of free text. Group 1 is the value.
+[etl.extract]
+site_from_device = ['^(\d{3,5})[A-Za-z]?[-_]', '\.us[a-z]{2}[a-z]+?(\d{3,5})\.', '^[A-Za-z]{2,4}[-_](\d{4})[-_]']
+site_from_text   = [
+  '\b(?i:FEI)\s*(?i:branch)?\s*[#:|-]?\s*(\d{3,5})[A-Za-z]?\b',      # FEI 412, FEI0412, FEI3223B, FEI Branch 1088
+  '\b(\d{4})[A-Za-z]?[-_][A-Z][A-Za-z]+[-_][A-Z]{2}\b',               # 1965-Cookeville-TN style names
+  '\|\|\s*(\d{4})\s*\|\|',                                            # "Site hard down || 2829 || …"
+  '\b(?i:site|branch|store)\s*[#:-]?\s*(\d{3,5})\b',                  # "site 0510", "branch 1088"
+]
+site_width       = 4
+site_label       = '^\d{3,5}[A-Za-z]?[-_]([A-Za-z][A-Za-z.]+(?:[-_ ][A-Za-z][a-z.]+)*)[-_]([A-Z]{2})(?:[-_ ]|$)'
+location_label   = '([A-Za-z][A-Za-z .]+?)[ _,]+([A-Z]{2})[ _,]+\d{5}'
+interface        = '((?:TenGigabit|TwentyFiveGig|FortyGig|HundredGig|Gigabit|Fast)?Ethernet\s?\d+(?:/\d+){1,3}|\b(?:Gi|Te|Fa|Eth|Po)\d+(?:/\d+){1,3}|Port:?\s?\d+|vni-\d+/\d+|StackPort\d+)'
+min_device_token = 6
+
+# ── Classification ──────────────────────────────────────────────────────────
+[classification]
+severity_labels        = { P1 = "Critical", P2 = "Major", P3 = "Minor", P4 = "Info" }
+actionable_severities  = ["P1", "P2", "P3"]
+noise_categories       = ["monitoring", "inventory"]
+default_severity       = "P3"
+down_pattern = '\b(down|stopped responding|lost|unreachable|disappeared|disassociated|failed|failure|offline|on battery|shutdown)\b'
+up_pattern   = '\b(up|restored|responding again|recovered|resumed|back online|on line|normal)\b'
+
+# Severity: first matching rule wins. Matched against "<event name> :: <message>", case-insensitive.
+[[classification.severity]]
+level   = "P4"
+pattern = '\b(is up|node up|interface up|responding again|restored|recovered|resumed|back online|on line|normal|completed|started|succeeded|enabled|undefined|is unknown|dropped from above|gained)\b'
+[[classification.severity]]
+level   = "P3"
+pattern = '^group\b|group .* member status|added to|removed from|has been unmanaged|name was changed|imported|discovery|maintenance|traps dropped|administratively|speed changed|fragmentation|no longer exists|status changed to .unknown'
+[[classification.severity]]
+level   = "P2"
+pattern = 'hardware .*(critical|warning)|\bcpu\b|memory|utili[sz]ation|packet loss|latency|flap|failover|\bbgp\b|\bospf\b|eigrp|disappeared|disassociated|rogue|rebooted|smart boost|smart trim|warning|interface down|interface status changed|port .*down|stack .* lost'
+[[classification.severity]]
+level   = "P1"
+pattern = 'node down|stopped responding|unreachable|is down|outage|on battery|heartbeat lost|critical|offline|\bdown\b'
+
+# Category: rules are tried against the event name first, then against the message.
+[[classification.category]]
+name    = "monitoring"
+pattern = '^group\b|group .* member|maintenance|traps dropped|discovery|fragmentation|service .*started|nightly'
+[[classification.category]]
+name    = "inventory"
+pattern = 'added to|removed from|unmanaged|name was changed|renamed|imported|no longer exists|data collection|element (added|removed)'
+[[classification.category]]
+name    = "power"
+pattern = '\bups\b|battery|power supply|smart (boost|trim)|on line|last fail cause|\bpdu\b'
+[[classification.category]]
+name    = "wireless"
+pattern = '\bap\b|access point|thin ap|\bwlc\b|wireless|capwap|rogue|ssid'
+[[classification.category]]
+name    = "routing"
+pattern = '\bbgp\b|\bospf\b|eigrp|\bwan\b|sd-wan|netpath|\bpath\b|\broute|\bisp\b|circuit|vni-'
+[[classification.category]]
+name    = "hardware"
+pattern = 'hardware|\bfan\b|temperature|sensor|switch stack|chassis|module|\bpsu\b'
+[[classification.category]]
+name    = "performance"
+pattern = '\bcpu\b|memory|utili[sz]ation|packet loss|latency|jitter|bandwidth'
+[[classification.category]]
+name    = "interface"
+pattern = 'interface|\bport\b|gigabit|ethernet|\bgi\d|\bte\d|uplink|\blink\b'
+[[classification.category]]
+name    = "connectivity"
+pattern = 'node|stopped responding|responding again|unreachable|reboot|heartbeat|alert|\bdown\b|\bup\b'
+
+# Device role, matched against "<device name> <machine type> <vendor>".
+[[classification.device_role]]
+name    = "ups"
+pattern = '\bapc|\bups\b|smartups|-ups-|american power'
+[[classification.device_role]]
+name    = "controller"
+pattern = 'wlc|vwlc|l-air-ctvm|controller'
+[[classification.device_role]]
+name    = "access point"
+pattern = '[-_]ap\d|\bap\d{2,}|\bmr\d{2}|meraki mr|access point|aironet'
+[[classification.device_role]]
+name    = "firewall"
+pattern = '[-_]fw\d*\b|firewall|palo alto|\bpa-\d|fortigate|firepower|\basa\d'
+[[classification.device_role]]
+name    = "router"
+pattern = 'rtr|router|\bisr\b|\basr\b|versa|edge|sd-wan|-wan-'
+[[classification.device_role]]
+name    = "switch"
+pattern = '[-_]sw\d*|switch|catalyst|nexus|n\d{4}|\bms\d{3}|2960|3248|3048|c9\d{3}|n9k|\bidf\b|\bmdf\b|-x\d-'
+[[classification.device_role]]
+name    = "printer"
+pattern = 'ricoh|\bim c\d|printer|xerox'
+
+# Known event types (names derived from the message patterns in the monitoring export).
+# Admins can rename and re-classify types in Data Studio → Event catalog.
+[event_types]
+1    = "Node Down"
+5    = "Node Up"
+8    = "Node Removed From Monitoring"
+9    = "Node Added To Monitoring"
+10   = "Interface Down"
+11   = "Interface Up"
+12   = "Interface Admin Shutdown"
+14   = "Node Rebooted"
+16   = "Element Added To Monitoring"
+17   = "Element Removed From Monitoring"
+19   = "Interface Status Changed"
+22   = "Interface Admin Enabled"
+23   = "Interface Removed"
+24   = "Interface Restored"
+50   = "Group Down"
+51   = "Group Warning"
+52   = "Group Up"
+53   = "Group Membership Changed"
+58   = "Group Critical"
+70   = "Discovery Completed"
+100  = "Node Renamed"
+140  = "Element Unmanaged"
+202  = "Volume Added"
+514  = "Hardware Health Unknown"
+515  = "Hardware Health Undefined"
+519  = "Hardware Health Up"
+520  = "Hardware Health Warning"
+521  = "Hardware Health Critical"
+523  = "Hardware Component Undefined"
+524  = "Hardware Component Up"
+525  = "Hardware Component Warning"
+526  = "Hardware Component Critical"
+528  = "Hardware Sensor Undefined"
+529  = "Hardware Sensor Up"
+530  = "Hardware Sensor Warning"
+531  = "Hardware Sensor Critical"
+604  = "Thin AP Disappeared"
+609  = "Switch Stack Changed"
+1000 = "Database Maintenance Purge"
+1001 = "Index Fragmentation Found"
+1500 = "Service Started"
+3805 = "NetPath Status Changed"
+3806 = "NetPath Status Restored"
+5000 = "Alert Triggered"
+5001 = "Alert Updated"
+5100 = "Nightly Maintenance Started"
+5101 = "Nightly Maintenance Completed"
+6205 = "Ports Imported"
+6600 = "Trap Dropped (Unmonitored Node)"
+6802 = "UPS Last Fail Cause Changed"
+6805 = "UPS Battery Normal"
+6806 = "UPS Battery Unknown"
+6807 = "UPS Status Unknown"
+6808 = "UPS On Line"
+6810 = "UPS On Smart Boost"
+6818 = "UPS On Smart Trim"
+
+# Monitoring status codes (SolarWinds Orion convention).
+[status_codes]
+0  = "Unknown"
+1  = "Up"
+2  = "Down"
+3  = "Warning"
+4  = "Shutdown"
+9  = "Unmanaged"
+10 = "Unplugged"
+12 = "Unreachable"
+14 = "Critical"
+15 = "Partly available"
+17 = "Could be unmanaged"
+
+# ── Playbooks: first-response steps per category ───────────────────────────
+# Placeholders: {device} {ip} {site} {site_label} {interface} {role}
+[playbooks]
+connectivity = [
+  "Confirm reachability of {device} ({ip}) from a second vantage point to rule out a monitoring-path issue.",
+  "Check the upstream switch or router port that feeds {device} for errors, err-disable or PoE faults.",
+  "Verify site power and WAN status for {site_label}; a site-wide drop points upstream, not at the device.",
+  "If still dark after 15 minutes, request on-site hands to check power, cabling and link lights.",
+]
+interface = [
+  "Pull interface counters on {device} {interface}: CRC, input errors, drops and last flap time.",
+  "Check speed and duplex against the far end and look for recent configuration changes.",
+  "Reseat or replace the patch cable or optic if errors keep climbing.",
+  "If the port feeds a UPS, AP or uplink, validate the downstream device separately.",
+]
+power = [
+  "Read the UPS status, load and battery runtime for {device}; note any 'on battery' transitions.",
+  "Confirm utility power at {site_label} with the branch and check the building's power events.",
+  "Schedule a battery self-test or replacement if the battery status is not 'Normal'.",
+]
+wireless = [
+  "Check the AP's CAPWAP join state and uptime on the wireless controller.",
+  "Verify PoE budget and the switch port that powers the AP; bounce PoE once if it is stuck.",
+  "Review controller licence headroom and DHCP scope for the AP VLAN.",
+  "Ask the branch whether handhelds or scanners are affected to size the impact.",
+]
+routing = [
+  "Check WAN/BGP neighbour state and the carrier circuit for {site_label}.",
+  "Confirm SD-WAN failover took over and traffic is flowing on the secondary path.",
+  "Open or update a carrier ticket with the circuit ID if the primary path is down.",
+]
+hardware = [
+  "Review hardware health on {device}: fans, PSUs, temperature and stack members.",
+  "Check environmental conditions in the IDF/MDF at {site_label}.",
+  "Raise an RMA if a component remains critical after a reseat.",
+]
+performance = [
+  "Identify top processes and top talkers on {device} (CPU, memory, interface utilisation).",
+  "Compare with the device's normal hourly profile to separate a spike from a trend.",
+  "Apply QoS or schedule maintenance if utilisation stays above threshold.",
+]
+inventory = [
+  "Confirm the monitoring change was intentional (added, removed, renamed or unmanaged).",
+  "Update the CMDB record for {device} if the inventory change is permanent.",
+]
+monitoring = [
+  "Treat as a monitoring-system notice; correlate with member device alerts before acting.",
+  "Check the polling engine's health if many groups change state at once.",
+]
+other = [
+  "Read the full event message and the device's recent timeline for context.",
+  "Check recent changes and escalate to the owning team if the impact is unclear.",
+]

@@ -1,0 +1,32 @@
+number,state,opened_by,sys_created_on,sys_updated_on,closed_at,assignment_group,assigned_to,short_description,description,work_notes,work_notes_list
+INC0095001,Resolved,admin,10-09-2026 09:15,10-09-2026 09:25,10-09-2026 09:25,Network Operations Center (NOC),Marcus Vance,P1 Outage: Dallas Distribution Center Core Switch 0412 offline,"Critical P1 Incident. Core Switch 0412-Dallas-TX-CoreSW-01 (10.201.10.1) unreachable.
+FEI 412
+FEI 0412
+Site: Dallas TX DC (4500 Logistics Way)
+Uplink to edge router TenGigabitEthernet1/0/1 dropped. Entire facility automated sort line halted.","10-09-2026 09:24:00 - Switch rebooted cleanly; dual power supplies stable; TenGigabitEthernet1/0/1 link UP.
+10-09-2026 09:17:30 - Dispatched on-site DC facilities engineer to inspect MDF rack PDU.",
+INC0095002,Open,admin,10-09-2026 09:16,10-09-2026 09:22,,Network Operations Center (NOC),Samantha Chen,Phoenix warehouse AP picking zone offline,"Wireless access point 2800-Phoenix-AZ-AP01 (10.188.45.15) offline.
+FEI 2800
+Location: Phoenix AZ Warehouse (8800 Desert Blvd).
+High CPU utilization preceded disconnect. Handheld picking scanners unable to associate.","10-09-2026 09:22:00 - High CPU alert (96%) logged on MR56 unit. Attempting PoE cycle from upstream switch.",
+INC0095003,In Progress,admin,10-09-2026 09:17,10-09-2026 09:28,,Network Operations Center (NOC),Alex Rivera,Atlanta Edge Router primary WAN BGP session flap,"Primary BGP peering dropped on edge router 1105-Atlanta-GA-EdgeRtr at 10.170.80.1.
+FEI 1105
+Site: Atlanta GA Regional Office (1200 Peachtree St).
+Interface GigabitEthernet0/0/2 toggled down. SD-WAN failover to broadband secondary engaged.","10-09-2026 09:28:00 - ISP confirms fiber cut repair on local loop. BGP route reconvergence in progress.",
+INC0095004,Open,admin,10-09-2026 09:18,10-09-2026 09:27,,Network Operations Center (NOC),Samantha Chen,Denver switch UPS management interface flapping,"Port flapping observed on 3410-Denver-CO-SW02 (10.160.22.40).
+FEI 3410
+Port 24 Gigabit and Port 48 10G uplink toggling state.
+Connected to Smart APC UPS management card. Site: Denver CO.","10-09-2026 09:27:00 - Investigating grounding and cable shielding on UPS network card.",
+CHG0096001,Closed,admin,10-09-2026 09:00,10-09-2026 09:32,10-09-2026 09:32,Network Operations Center (NOC),David Ross,Chicago Firewall cluster firmware maintenance,"Scheduled maintenance: Palo Alto firewall firmware upgrade for 0850-Chicago-IL-FW01 (10.135.5.1).
+FEI 850
+FEI 0850
+Facility: Chicago IL (350 Michigan Ave).
+Expected HA failover and brief heartbeat interruption during reboot cycle.","10-09-2026 09:30:00 - Firmware update 11.1.2 applied successfully. HA pair synchronized and passing traffic.",
+INC0095005,Open,admin,10-09-2026 09:25,10-09-2026 09:30,,Network Operations Center (NOC),Samantha Chen,Thin AP disassociated from wireless controller LEB-FLEX-vWLC,"Wireless controller LEB-FLEX-vWLC (10.254.71.4) reported sudden disassociation of lightweight access point.
+Device: LEB-FLEX-vWLC
+CAPWAP tunnel state torn down.","10-09-2026 09:30:00 - Checking DHCP lease pool and controller AP licensing ceiling.",
+RITM0097001,Pending,admin,10-09-2026 09:10,10-09-2026 09:20,,Network Operations Center (NOC),,Dallas to Atlanta bandwidth expansion request,"Request for SD-WAN path prioritization and QoS profile update between:
+0412-Dallas-TX-CoreSW-01 (10.201.10.1)
+1105-Atlanta-GA-EdgeRtr (10.170.80.1)
+FEI 412
+FEI 1105","10-09-2026 09:20:00 - Pending capacity review from network architecture team.",

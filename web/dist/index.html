@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="csrf" content="">
+    <meta name="theme-color" content="#00446A" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preload" href="/static/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <title>Loading…</title>
+    <script>
+      (function () {
+        var d = document.documentElement, t = null, s = null;
+        try { t = localStorage.getItem("nocturne-theme"); s = localStorage.getItem("nocturne-side"); } catch (e) {}
+        if (!t || t === "system") t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        d.setAttribute("data-theme", t);
+        if (s === "mini") d.setAttribute("data-side", "mini");
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-Bw60FZlI.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-JKRwpIS0.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

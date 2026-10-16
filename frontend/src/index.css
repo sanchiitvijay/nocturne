@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+/* Day/night theme is a data attribute on <html>, set before first paint by index.html. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Fonts are served by the backend from /static so the app runs on air-gapped networks. */
+@font-face {
+  font-family: "Archivo"; font-style: normal; font-display: swap; font-weight: 100 900; font-stretch: 62% 125%;
+  src: url("/static/fonts/archivo-latin-wdth-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Archivo"; font-style: normal; font-display: swap; font-weight: 100 900; font-stretch: 62% 125%;
+  src: url("/static/fonts/archivo-latin-ext-wdth-normal.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Spline Sans Mono"; font-style: normal; font-display: swap; font-weight: 300 700;
+  src: url("/static/fonts/spline-sans-mono-latin-wght-normal.woff2") format("woff2");
+}
+
+/* ── Tokens: Ferguson navy #00446A and grey #77787B on flat surfaces. No purples. ── */
+:root {
+  color-scheme: light;
+  --brand: #00446a; --brand-600: #0a5a88; --brand-700: #003352; --brand-50: #edf4f9; --brand-100: #d7e7f2; --brand-200: #b4d1e5;
+  --on-brand: #ffffff; --steel: #77787b;
+  --bg: #f4f6f8; --surface: #ffffff; --surface-2: #f8fafb; --surface-3: #eff2f5; --hover: #f1f5f8;
+  --border: #e2e7ec; --border-strong: #c9d2da;
+  --text: #13212c; --text-2: #4a5866; --text-3: #75808b; --link: #00609a; --focus: #2b87c8;
+  --p1: #c8102e; --p1-bg: #fdecee; --p1-ink: #9f0c24;
+  --p2: #d2601a; --p2-bg: #fdf0e6; --p2-ink: #9a4510;
+  --p3: #b08300; --p3-bg: #fbf5e0; --p3-ink: #765800;
+  --p4: #2b7f74; --p4-bg: #e5f3f1; --p4-ink: #1c5e55;
+  --good: #2e7d40; --good-bg: #e6f3e9; --good-ink: #1f5c2d;
+  --warn: #a86e00; --warn-bg: #fbf2de; --warn-ink: #714a00;
+  --info-bg: #edf4f9; --info-ink: #0a4a72;
+  --c-connectivity: #00446a; --c-interface: #2f74b5; --c-routing: #2e8540; --c-wireless: #0e8a8a;
+  --c-power: #b5651d; --c-hardware: #5e6b78; --c-performance: #b4466a; --c-monitoring: #8a949e;
+  --c-inventory: #a0a8b0; --c-other: #b3bac1;
+  --seq-1: #d7e7f2; --seq-2: #a9c9e0; --seq-3: #6e9fc6; --seq-4: #2f6f9f; --seq-5: #00446a; --seq-6: #002a42;
+  --shadow-md: 0 6px 20px -8px rgba(16, 33, 44, .18), 0 1px 3px rgba(16, 33, 44, .06);
+  --shadow-lg: 0 24px 60px -18px rgba(16, 33, 44, .35), 0 2px 8px rgba(16, 33, 44, .08);
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --brand: #5ba9dc; --brand-600: #7cbce6; --brand-700: #a7d3f0; --brand-50: #1a2633; --brand-100: #232f3f; --brand-200: #2d3f51;
+  --on-brand: #04131e; --steel: #9a9b9e;
+  --bg: #111316; --surface: #1a1e22; --surface-2: #242a31; --surface-3: #2d3440; --hover: #313842;
+  --border: #3a4150; --border-strong: #4a525d;
+  --text: #e8e9eb; --text-2: #b8bac0; --text-3: #8a8c94; --link: #5ba9dc; --focus: #5ba9dc;
+  --p1: #ff5d6c; --p1-bg: #3a1820; --p1-ink: #ffa3ac;
+  --p2: #f59a4e; --p2-bg: #382414; --p2-ink: #ffc596;
+  --p3: #e8c14f; --p3-bg: #342b12; --p3-ink: #f2d88a;
+  --p4: #4dbfae; --p4-bg: #11322e; --p4-ink: #8edccf;
+  --good: #5bc07b; --good-bg: #13321f; --good-ink: #9bdfb0;
+  --warn: #e8b04a; --warn-bg: #352812; --warn-ink: #f2d08e;
+  --info-bg: #1f2a37; --info-ink: #7cbce6;
+  --c-connectivity: #5ba9dc; --c-interface: #7fb2e5; --c-routing: #5bc07b; --c-wireless: #3cc4c4;
+  --c-power: #e0965a; --c-hardware: #9aa8b6; --c-performance: #e07c9c; --c-monitoring: #a3adb6;
+  --c-inventory: #8e9aa5; --c-other: #7d8a96;
+  --seq-1: #232f3f; --seq-2: #2e3f54; --seq-3: #395174; --seq-4: #4a6b96; --seq-5: #5ba9dc; --seq-6: #7cbce6;
+  --shadow-md: 0 8px 24px -10px rgba(0, 0, 0, .8);
+  --shadow-lg: 0 28px 70px -18px rgba(0, 0, 0, .9);
+}
+
+@theme inline {
+  --font-sans: "Archivo", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "Spline Sans Mono", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  --color-brand: var(--brand); --color-brand-600: var(--brand-600); --color-brand-700: var(--brand-700);
+  --color-brand-50: var(--brand-50); --color-brand-100: var(--brand-100); --color-brand-200: var(--brand-200);
+  --color-on-brand: var(--on-brand); --color-steel: var(--steel);
+  --color-canvas: var(--bg); --color-surface: var(--surface); --color-surface-2: var(--surface-2); --color-surface-3: var(--surface-3);
+  --color-hover: var(--hover); --color-line: var(--border); --color-line-strong: var(--border-strong);
+  --color-ink: var(--text); --color-ink-2: var(--text-2); --color-ink-3: var(--text-3); --color-link: var(--link); --color-focus: var(--focus);
+  --color-p1: var(--p1); --color-p1-bg: var(--p1-bg); --color-p1-ink: var(--p1-ink);
+  --color-p2: var(--p2); --color-p2-bg: var(--p2-bg); --color-p2-ink: var(--p2-ink);
+  --color-p3: var(--p3); --color-p3-bg: var(--p3-bg); --color-p3-ink: var(--p3-ink);
+  --color-p4: var(--p4); --color-p4-bg: var(--p4-bg); --color-p4-ink: var(--p4-ink);
+  --color-good: var(--good); --color-good-bg: var(--good-bg); --color-good-ink: var(--good-ink);
+  --color-warn: var(--warn); --color-warn-bg: var(--warn-bg); --color-warn-ink: var(--warn-ink);
+  --color-info-bg: var(--info-bg); --color-info-ink: var(--info-ink);
+  --shadow-card: var(--shadow-md); --shadow-pop: var(--shadow-lg);
+  --animate-rise: rise .45s cubic-bezier(.2, .8, .2, 1) both;
+  --animate-fresh: fresh 2.4s ease-out;
+  --animate-ping-soft: ping-soft 2s infinite;
+  --animate-indeterminate: indeterminate 1.1s ease-in-out infinite;
+}
+
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fresh { 0% { background-color: var(--brand-50); } 100% { background-color: var(--surface); } }
+@keyframes ping-soft { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 45%, transparent); } 80%, 100% { box-shadow: 0 0 0 8px transparent; } }
+@keyframes indeterminate { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-canvas text-ink font-sans antialiased; font-size: 14.5px; line-height: 1.55; min-height: 100vh; }
+  a { @apply text-link; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1, h2, h3, h4 { @apply font-semibold text-ink; line-height: 1.25; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  input[type="checkbox"] { accent-color: var(--brand); width: 16px; height: 16px; cursor: pointer; }
+  ::selection { background: var(--brand-100); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+}
